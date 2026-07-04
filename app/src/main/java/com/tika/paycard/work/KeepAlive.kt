@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 
@@ -43,14 +42,12 @@ object KeepAlive {
 
     /** 是否已在电池优化白名单 */
     fun isIgnoringBattery(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         return pm.isIgnoringBatteryOptimizations(context.packageName)
     }
 
     /** 跳到「忽略电池优化」申请弹窗(系统标准,三家通用) */
     fun requestIgnoreBattery(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
         runCatching {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
                 data = Uri.parse("package:${context.packageName}")
