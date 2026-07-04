@@ -41,7 +41,7 @@ class PayCodeRepository {
         }
     }
 
-    private fun parse(html: String): Result {
+    internal fun parse(html: String): Result {
         val code = CODE_RE.find(html)?.groupValues?.get(1)
         if (code.isNullOrBlank()) return Result.Invalid
 

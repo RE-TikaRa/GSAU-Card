@@ -49,6 +49,9 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 
 # 编译 debug apk
 ./gradlew assembleDebug
+
+# 跑解析层单元测试（付款码页面解析、链接解析）
+./gradlew testDebugUnitTest
 ```
 
 产物在 `app/build/outputs/apk/debug/app-debug.apk`。
