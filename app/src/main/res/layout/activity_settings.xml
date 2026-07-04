@@ -1,99 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/screen_bg">
 
-    <LinearLayout
+    <include
+        android:id="@+id/topbar"
+        layout="@layout/view_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_keepalive_title"
-            android:textColor="@color/text_dark"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_keepalive_desc"
-            android:textColor="@color/text_hint"
-            android:textSize="13sp"
-            android:layout_marginBottom="12dp" />
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="24dp">
 
-        <RadioGroup
-            android:id="@+id/modeGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_item"
-            android:padding="12dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_appearance_title"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
 
-            <RadioButton
-                android:id="@+id/radioLite"
+            <RadioGroup
+                android:id="@+id/themeGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_mode_lite"
-                android:textSize="15sp"
-                android:paddingVertical="8dp" />
+                android:background="@drawable/bg_item"
+                android:padding="8dp">
 
-            <RadioButton
-                android:id="@+id/radioSteady"
+                <RadioButton
+                    android:id="@+id/themeSystem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_theme_system"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:buttonTint="@color/primary" />
+
+                <RadioButton
+                    android:id="@+id/themeLight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_theme_light"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:buttonTint="@color/primary" />
+
+                <RadioButton
+                    android:id="@+id/themeDark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_theme_dark"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:buttonTint="@color/primary" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_keepalive_title"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_mode_steady"
-                android:textSize="15sp"
-                android:paddingVertical="8dp" />
-        </RadioGroup>
+                android:text="@string/settings_keepalive_desc"
+                android:textColor="@color/text_hint"
+                android:textSize="13sp"
+                android:layout_marginBottom="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_system_title"
-            android:textColor="@color/text_dark"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp" />
+            <RadioGroup
+                android:id="@+id/modeGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_item"
+                android:padding="8dp">
 
-        <TextView
-            android:id="@+id/batteryStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="@string/settings_battery_off"
-            android:textColor="@color/text_hint"
-            android:textSize="13sp"
-            android:layout_marginBottom="8dp" />
+                <RadioButton
+                    android:id="@+id/radioLite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_mode_lite"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:buttonTint="@color/primary" />
 
-        <Button
-            android:id="@+id/btnBattery"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_battery_button"
-            android:textColor="@color/text_light"
-            android:background="@drawable/bg_button"
-            android:layout_marginBottom="12dp" />
+                <RadioButton
+                    android:id="@+id/radioSteady"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_mode_steady"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:paddingVertical="10dp"
+                    android:paddingHorizontal="8dp"
+                    android:buttonTint="@color/primary" />
+            </RadioGroup>
 
-        <Button
-            android:id="@+id/btnAutostart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_autostart_button"
-            android:textColor="@color/text_light"
-            android:background="@drawable/bg_button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_system_title"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_rom_hint"
-            android:textColor="@color/text_hint"
-            android:textSize="12sp"
-            android:layout_marginTop="12dp" />
-    </LinearLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/batteryStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="@string/settings_battery_off"
+                android:textColor="@color/text_hint"
+                android:textSize="13sp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnBattery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_battery_button"
+                android:textColor="@color/on_primary"
+                android:background="@drawable/bg_button"
+                android:stateListAnimator="@null"
+                android:paddingVertical="12dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnAutostart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_autostart_button"
+                android:textColor="@color/text_dark"
+                android:background="@drawable/bg_button_tonal"
+                android:stateListAnimator="@null"
+                android:paddingVertical="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_rom_hint"
+                android:textColor="@color/text_hint"
+                android:textSize="12sp"
+                android:layout_marginTop="12dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

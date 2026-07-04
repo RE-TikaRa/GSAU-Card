@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌绿（深色下略提亮，降低纯黑背景上的刺眼感） -->
+    <color name="primary">#4CAF50</color>
+    <color name="primary_dark">#2E7D32</color>
+    <color name="accent">#81C784</color>
+
+    <!-- 语义化颜色（深色） -->
+    <color name="screen_bg">#101410</color>
+    <color name="surface">#1C211C</color>
+    <color name="surface_variant">#262B26</color>
+    <color name="outline">#3A403A</color>
+    <color name="name_bar">#2E7D32</color>
+    <color name="qr_block">#FFFFFF</color>
+
+    <color name="text_dark">#E6E6E6</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="text_light">#FFFFFF</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <color name="scrim">#99000000</color>
+
+    <!-- 二维码在深色下仍用浅底深矩阵 -->
+    <color name="qr_foreground">#000000</color>
+    <color name="qr_background">#FFFFFF</color>
+</resources>

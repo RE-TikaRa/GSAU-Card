@@ -5,16 +5,18 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:background="@drawable/bg_item"
+    android:background="@drawable/bg_item_ripple"
+    android:clickable="true"
+    android:focusable="true"
     android:padding="14dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="10dp">
 
     <View
         android:id="@+id/itemCurrent"
-        android:layout_width="6dp"
+        android:layout_width="5dp"
         android:layout_height="36dp"
-        android:background="@color/primary"
-        android:layout_marginEnd="12dp" />
+        android:background="@drawable/bg_indicator"
+        android:layout_marginEnd="14dp" />
 
     <LinearLayout
         android:layout_width="0dp"

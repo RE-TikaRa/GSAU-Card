@@ -35,6 +35,8 @@ class PayActivity : AppCompatActivity() {
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        binding.topbar.topbarTitle.text = getString(R.string.pay_title)
+        binding.topbar.btnBack.setOnClickListener { finish() }
         binding.payQr.setOnClickListener { refresh() }
         binding.payRefresh.setOnClickListener { refresh() }
     }

@@ -3,8 +3,8 @@
     android:color="@color/accent">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/primary" />
-            <corners android:radius="14dp" />
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="12dp" />
         </shape>
     </item>
 </ripple>

@@ -17,10 +17,12 @@
     <string name="cd_add">添加</string>
     <string name="cd_settings">设置</string>
     <string name="cd_qr">付款码</string>
+    <string name="cd_back">返回主页</string>
+    <string name="pay_title">付款码</string>
 
     <!-- 添加卡片对话框 -->
     <string name="add_dialog_title">添加校园卡</string>
-    <string name="add_dialog_message">从微信打开付款码页面，复制链接后粘贴到这里</string>
+    <string name="add_dialog_message">从企业微信微信打开付款码页面，复制链接后粘贴到这里</string>
     <string name="add_dialog_hint">粘贴付款码链接</string>
     <string name="add_action">添加</string>
     <string name="add_no_openid">链接里没找到 openid，请检查</string>
@@ -50,6 +52,10 @@
 
     <!-- 设置页 -->
     <string name="settings_title">设置</string>
+    <string name="settings_appearance_title">外观</string>
+    <string name="settings_theme_system">跟随系统</string>
+    <string name="settings_theme_light">浅色模式</string>
+    <string name="settings_theme_dark">深色模式</string>
     <string name="settings_keepalive_title">后台保活</string>
     <string name="settings_keepalive_desc">不管选哪档，点开付款页永远实时拉最新码。</string>
     <string name="settings_mode_lite">省心档：后台定时刷新，无常驻通知</string>

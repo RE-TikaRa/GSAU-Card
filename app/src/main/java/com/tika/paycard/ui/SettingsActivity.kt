@@ -19,6 +19,23 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.topbar.topbarTitle.text = getString(R.string.settings_title)
+        binding.topbar.btnBack.setOnClickListener { finish() }
+
+        when (ThemeManager.getMode(this)) {
+            ThemeManager.Mode.SYSTEM -> binding.themeSystem.isChecked = true
+            ThemeManager.Mode.LIGHT -> binding.themeLight.isChecked = true
+            ThemeManager.Mode.DARK -> binding.themeDark.isChecked = true
+        }
+        binding.themeGroup.setOnCheckedChangeListener { _, checkedId ->
+            val mode = when (checkedId) {
+                binding.themeLight.id -> ThemeManager.Mode.LIGHT
+                binding.themeDark.id -> ThemeManager.Mode.DARK
+                else -> ThemeManager.Mode.SYSTEM
+            }
+            if (mode != ThemeManager.getMode(this)) ThemeManager.setMode(this, mode)
+        }
+
         when (KeepAlive.getMode(this)) {
             KeepAlive.Mode.LITE -> binding.radioLite.isChecked = true
             KeepAlive.Mode.STEADY -> binding.radioSteady.isChecked = true

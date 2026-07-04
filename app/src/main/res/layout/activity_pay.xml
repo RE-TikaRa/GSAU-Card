@@ -4,53 +4,79 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white"
-    android:gravity="center_horizontal"
-    android:padding="24dp">
+    android:background="@color/screen_bg"
+    android:padding="16dp">
 
-    <TextView
-        android:id="@+id/payName"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/topbar"
+        layout="@layout/view_topbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        tools:text="姓名"
-        android:textColor="@color/text_dark"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:layout_marginVertical="8dp" />
 
-    <TextView
-        android:id="@+id/payBalance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textColor="@color/text_hint"
-        android:textSize="15sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@drawable/bg_card"
+        android:padding="24dp"
+        android:layout_marginTop="8dp">
 
-    <ImageView
-        android:id="@+id/payQr"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="40dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="@string/cd_qr" />
+        <TextView
+            android:id="@+id/payName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            tools:text="姓名"
+            android:textColor="@color/text_dark"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/payHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/pay_auto_refresh"
-        android:textColor="@color/text_hint"
-        android:textSize="14sp"
-        android:gravity="center" />
+        <TextView
+            android:id="@+id/payBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/text_hint"
+            android:textSize="15sp" />
 
-    <Button
-        android:id="@+id/payRefresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/pay_refresh_button"
-        android:textColor="@color/text_light"
-        android:background="@drawable/bg_button"
-        android:paddingHorizontal="32dp" />
+        <FrameLayout
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_qr_block"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/payQr"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/cd_qr" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/payHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/pay_auto_refresh"
+            android:textColor="@color/text_hint"
+            android:textSize="14sp"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/payRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/pay_refresh_button"
+            android:textColor="@color/on_primary"
+            android:background="@drawable/bg_button"
+            android:stateListAnimator="@null"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="12dp" />
+    </LinearLayout>
 </LinearLayout>

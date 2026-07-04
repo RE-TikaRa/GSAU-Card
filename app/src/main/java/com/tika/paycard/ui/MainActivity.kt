@@ -3,7 +3,6 @@ package com.tika.paycard.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -111,16 +110,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAddDialog() {
-        val input = android.widget.EditText(this).apply {
-            hint = getString(R.string.add_dialog_hint)
-        }
-        AlertDialog.Builder(this)
-            .setTitle(R.string.add_dialog_title)
-            .setMessage(R.string.add_dialog_message)
-            .setView(input)
-            .setPositiveButton(R.string.add_action) { _, _ -> addFromLink(input.text.toString()) }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        AppDialog.input(
+            context = this,
+            title = getString(R.string.add_dialog_title),
+            message = getString(R.string.add_dialog_message),
+            hint = getString(R.string.add_dialog_hint),
+            positiveText = getString(R.string.add_action),
+            onPositive = { link -> addFromLink(link) }
+        )
     }
 
     private fun addFromLink(link: String) {
@@ -161,16 +158,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun confirmRemove(index: Int) {
         val account = store.list().getOrNull(index) ?: return
-        AlertDialog.Builder(this)
-            .setTitle(R.string.remove_dialog_title)
-            .setMessage(getString(R.string.remove_dialog_message, account.displayName()))
-            .setPositiveButton(R.string.remove_action) { _, _ ->
+        AppDialog.confirm(
+            context = this,
+            title = getString(R.string.remove_dialog_title),
+            message = getString(R.string.remove_dialog_message, account.displayName()),
+            positiveText = getString(R.string.remove_action),
+            onPositive = {
                 store.removeAt(index)
                 renderCurrent()
                 adapter.submit(store.list(), store.currentIndex())
                 PayWidgetProvider.refreshAll(this)
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+        )
     }
 }
