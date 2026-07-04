@@ -1,5 +1,6 @@
 package com.tika.paycard.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +37,14 @@ class PayActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         binding.topbar.topbarTitle.text = getString(R.string.pay_title)
-        binding.topbar.btnBack.setOnClickListener { finish() }
+        // 返回按钮回软件主页面:从桌面组件单独起时栈里没有主界面,新建;App 内进来则复用已有实例。
+        binding.topbar.btnBack.setOnClickListener {
+            startActivity(
+                Intent(this, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            )
+            finish()
+        }
         binding.payQr.setOnClickListener { refresh() }
         binding.payRefresh.setOnClickListener { refresh() }
     }
