@@ -1,7 +1,6 @@
 package com.tika.paycard.ui
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.tika.paycard.R
 import com.tika.paycard.databinding.ActivitySettingsBinding
@@ -51,7 +50,7 @@ class SettingsActivity : AppCompatActivity() {
                 R.string.settings_mode_steady_tip
             else
                 R.string.settings_mode_lite_tip
-            Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
+            AppDialog.notice(binding.root, getString(tip))
         }
 
         binding.btnBattery.setOnClickListener {

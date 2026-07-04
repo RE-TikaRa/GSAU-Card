@@ -1,9 +1,11 @@
 package com.tika.paycard.ui
 
+import android.app.Dialog
 import android.content.Context
 import android.text.InputType
 import android.view.LayoutInflater
-import android.app.Dialog
+import android.view.View
+import com.google.android.material.snackbar.Snackbar
 import com.tika.paycard.R
 import com.tika.paycard.databinding.DialogAppBinding
 
@@ -56,6 +58,11 @@ object AppDialog {
             binding.dialogNegative.setOnClickListener { dismiss() }
             binding.dialogInput.requestFocus()
         }
+    }
+
+    /** 轻提示:操作结果、校验失败等短反馈,跟随 App 主题,替代系统 Toast。 */
+    fun notice(anchor: View, message: CharSequence) {
+        Snackbar.make(anchor, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private inline fun build(

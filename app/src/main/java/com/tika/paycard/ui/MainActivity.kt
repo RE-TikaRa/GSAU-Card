@@ -2,7 +2,6 @@ package com.tika.paycard.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -123,7 +122,7 @@ class MainActivity : AppCompatActivity() {
     private fun addFromLink(link: String) {
         val parsed = LinkParser.parse(link)
         if (parsed == null) {
-            Toast.makeText(this, R.string.add_no_openid, Toast.LENGTH_LONG).show()
+            AppDialog.notice(binding.root, getString(R.string.add_no_openid))
             return
         }
         val account = Account(openid = parsed.openid, cardId = parsed.cardId)
@@ -138,20 +137,12 @@ class MainActivity : AppCompatActivity() {
                     renderCurrent()
                     adapter.submit(store.list(), store.currentIndex())
                     PayWidgetProvider.refreshAll(this@MainActivity)
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.add_success, account.displayName()),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    AppDialog.notice(binding.root, getString(R.string.add_success, account.displayName()))
                 }
                 is PayCodeRepository.Result.Invalid ->
-                    Toast.makeText(this@MainActivity, R.string.add_invalid, Toast.LENGTH_LONG).show()
+                    AppDialog.notice(binding.root, getString(R.string.add_invalid))
                 is PayCodeRepository.Result.Error ->
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.add_verify_failed, r.message),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    AppDialog.notice(binding.root, getString(R.string.add_verify_failed, r.message))
             }
         }
     }
