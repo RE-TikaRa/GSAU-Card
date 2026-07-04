@@ -35,10 +35,10 @@ class PayWidgetProvider : AppWidgetProvider() {
         val account = AccountStore.get(context).current()
 
         if (account == null) {
-            views.setTextViewText(R.id.widget_name, "点击添加校园卡")
+            views.setTextViewText(R.id.widget_name, context.getString(R.string.widget_add_card))
             views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
             views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
-            views.setTextViewText(R.id.widget_hint, "未添加账号")
+            views.setTextViewText(R.id.widget_hint, context.getString(R.string.widget_no_account))
             views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context))
         } else {
             views.setTextViewText(R.id.widget_name, account.displayName())
@@ -50,7 +50,7 @@ class PayWidgetProvider : AppWidgetProvider() {
             } else {
                 views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
-                views.setTextViewText(R.id.widget_hint, "点击刷新付款码")
+                views.setTextViewText(R.id.widget_hint, context.getString(R.string.widget_tap_refresh))
             }
             // 点姓名条切换用户
             views.setOnClickPendingIntent(R.id.widget_name, switchIntent(context))

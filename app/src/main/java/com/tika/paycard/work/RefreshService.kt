@@ -62,17 +62,17 @@ class RefreshService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "付款码保活",
+                getString(R.string.notif_channel_name),
                 NotificationManager.IMPORTANCE_MIN
             ).apply {
-                description = "后台刷新付款码,保证组件上的码有效"
+                description = getString(R.string.notif_channel_desc)
                 setShowBadge(false)
             }
             mgr.createNotificationChannel(channel)
         }
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("甘农卡")
-            .setContentText("付款码后台刷新中")
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.notif_content))
             .setSmallIcon(R.drawable.ic_notification)
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setOngoing(true)

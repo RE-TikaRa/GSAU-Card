@@ -53,12 +53,13 @@ class PayActivity : AppCompatActivity() {
     private fun showCached() {
         val account = AccountStore.get(this).current()
         if (account == null) {
-            binding.payName.text = "未添加账号"
-            binding.payHint.text = "请先在主界面添加校园卡"
+            binding.payName.text = getString(R.string.pay_no_card)
+            binding.payHint.text = getString(R.string.pay_no_card_hint)
             return
         }
         binding.payName.text = account.displayName()
-        binding.payBalance.text = if (account.balance.isNotBlank()) "余额 ${account.balance}" else ""
+        binding.payBalance.text =
+            if (account.balance.isNotBlank()) getString(R.string.balance_format, account.balance) else ""
         if (account.cachedCode.isNotBlank()) {
             binding.payQr.setImageBitmap(QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_FULLSCREEN))
         }
@@ -76,7 +77,7 @@ class PayActivity : AppCompatActivity() {
 
     private fun refresh() {
         val account = AccountStore.get(this).current() ?: return
-        binding.payHint.text = "刷新中…"
+        binding.payHint.text = getString(R.string.pay_refreshing)
         lifecycleScope.launch {
             val r = PayCodeManager.refresh(this@PayActivity, account)
             // 刷新期间当前账号可能已被切换,只更新仍是当前账号的结果,避免展示错卡
@@ -85,15 +86,16 @@ class PayActivity : AppCompatActivity() {
                 is PayCodeRepository.Result.Ok -> {
                     binding.payQr.setImageBitmap(QrGenerator.encode(r.code, QrGenerator.SIZE_FULLSCREEN))
                     binding.payName.text = account.displayName()
-                    binding.payBalance.text = if (r.balance.isNotBlank()) "余额 ${r.balance}" else ""
-                    binding.payHint.text = "每分钟自动刷新，点二维码可手动刷新"
+                    binding.payBalance.text =
+                        if (r.balance.isNotBlank()) getString(R.string.balance_format, r.balance) else ""
+                    binding.payHint.text = getString(R.string.pay_auto_refresh)
                     PayWidgetProvider.refreshAll(this@PayActivity)
                 }
                 is PayCodeRepository.Result.Invalid -> {
-                    binding.payHint.text = "凭证失效，请重新粘贴链接添加"
+                    binding.payHint.text = getString(R.string.pay_invalid)
                 }
                 is PayCodeRepository.Result.Error -> {
-                    binding.payHint.text = "刷新失败：${r.message}"
+                    binding.payHint.text = getString(R.string.pay_refresh_failed, r.message)
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.tika.paycard.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.tika.paycard.R
 import com.tika.paycard.data.Account
 import com.tika.paycard.databinding.ItemAccountBinding
 
@@ -34,12 +35,13 @@ class AccountAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val account = items[position]
+        val context = holder.binding.root.context
         holder.binding.itemName.text = account.displayName()
         holder.binding.itemInfo.text = buildString {
             if (account.cardNo.isNotBlank()) append(account.cardNo)
             if (account.balance.isNotBlank()) {
                 if (isNotEmpty()) append("  ")
-                append("余额 ${account.balance}")
+                append(context.getString(R.string.balance_format, account.balance))
             }
         }
         holder.binding.itemCurrent.visibility =

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="姓名"
+        tools:text="姓名"
         android:textColor="@color/text_dark"
         android:textSize="22sp"
         android:textStyle="bold" />
@@ -32,14 +33,14 @@
         android:layout_height="300dp"
         android:layout_marginTop="40dp"
         android:scaleType="fitCenter"
-        android:contentDescription="付款码" />
+        android:contentDescription="@string/cd_qr" />
 
     <TextView
         android:id="@+id/payHint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="每分钟自动刷新，点二维码可手动刷新"
+        android:text="@string/pay_auto_refresh"
         android:textColor="@color/text_hint"
         android:textSize="14sp"
         android:gravity="center" />
@@ -49,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="刷新付款码"
+        android:text="@string/pay_refresh_button"
         android:textColor="@color/text_light"
         android:background="@drawable/bg_button"
         android:paddingHorizontal="32dp" />

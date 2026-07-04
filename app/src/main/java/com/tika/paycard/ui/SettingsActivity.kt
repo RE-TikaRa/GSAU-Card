@@ -3,6 +3,7 @@ package com.tika.paycard.ui
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.tika.paycard.R
 import com.tika.paycard.databinding.ActivitySettingsBinding
 import com.tika.paycard.work.KeepAlive
 
@@ -30,9 +31,9 @@ class SettingsActivity : AppCompatActivity() {
             }
             KeepAlive.setMode(this, mode)
             val tip = if (mode == KeepAlive.Mode.STEADY)
-                "已开启前台服务保活（通知栏会有一条常驻通知）"
+                R.string.settings_mode_steady_tip
             else
-                "已切到省心档（无常驻通知）"
+                R.string.settings_mode_lite_tip
             Toast.makeText(this, tip, Toast.LENGTH_SHORT).show()
         }
 
@@ -46,7 +47,9 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        binding.batteryStatus.text = if (KeepAlive.isIgnoringBattery(this))
-            "已加入电池白名单" else "未加入电池白名单（建议开启）"
+        binding.batteryStatus.text = getString(
+            if (KeepAlive.isIgnoringBattery(this)) R.string.settings_battery_on
+            else R.string.settings_battery_off
+        )
     }
 }

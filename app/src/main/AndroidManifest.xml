@@ -32,7 +32,7 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:exported="false"
-            android:label="设置" />
+            android:label="@string/settings_title" />
 
         <service
             android:name=".work.RefreshService"

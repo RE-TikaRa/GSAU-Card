@@ -32,3 +32,14 @@
 ## 4. 二维码渲染尺寸
 
 **决策**:`QrGenerator` 定义三档语义化尺寸常量（`SIZE_WIDGET=400` / `SIZE_CARD=600` / `SIZE_FULLSCREEN=700`），替代散落的魔法数字。二维码是矢量矩阵，尺寸只影响位图清晰度，不影响扫码内容。
+
+## 5. 用户可见文案的外部化边界
+
+**决策**:所有界面文案统一进 `res/values/strings.xml`，界面层（Activity/Adapter/Widget/Service/Manifest/布局）一律引用 `@string` 或 `getString`。设计占位（列表项姓名、组件姓名条等运行时覆盖的文本）改用 `tools:text`，不进包体。
+
+**边界**:数据/模型层保留少量字面量,不接线 `R.string`：
+
+- `Account.displayName()` 的 `"卡"` 前缀——纯数据模型,无 `Context`。
+- `PayCodeRepository` 的 `"网络错误"`、`PayCodeManager` 的 `"无账号"`——数据层不持有 `Context`,仅作为兜底 `message` 冒泡给 UI,UI 已有自己的 `@string` 文案包裹。
+
+**理由**:为取字符串给数据层回注 `Context` 属于分层倒退,得不偿失。这些字面量不面向最终展示（UI 分支各自用 `@string`），保留在原地更干净。

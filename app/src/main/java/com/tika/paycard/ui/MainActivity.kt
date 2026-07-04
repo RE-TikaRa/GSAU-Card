@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.tika.paycard.R
 import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.LinkParser
@@ -61,19 +62,20 @@ class MainActivity : AppCompatActivity() {
     private fun renderCurrent() {
         val account = store.current()
         if (account == null) {
-            binding.cardName.text = "未添加校园卡"
+            binding.cardName.text = getString(R.string.main_no_card)
             binding.cardBalance.text = ""
             binding.cardQr.setImageDrawable(null)
-            binding.cardHint.text = "点右上角 + 粘贴付款码链接添加"
+            binding.cardHint.text = getString(R.string.main_add_hint)
             return
         }
         binding.cardName.text = account.displayName()
-        binding.cardBalance.text = if (account.balance.isNotBlank()) "余额 ${account.balance}" else ""
+        binding.cardBalance.text =
+            if (account.balance.isNotBlank()) getString(R.string.balance_format, account.balance) else ""
         if (account.cachedCode.isNotBlank()) {
             binding.cardQr.setImageBitmap(QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD))
-            binding.cardHint.text = "点二维码进入全屏付款"
+            binding.cardHint.text = getString(R.string.main_tap_qr)
         } else {
-            binding.cardHint.text = "正在获取付款码…"
+            binding.cardHint.text = getString(R.string.main_loading)
         }
         refreshCurrent(account)
     }
@@ -86,16 +88,17 @@ class MainActivity : AppCompatActivity() {
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
                     binding.cardName.text = account.displayName()
-                    binding.cardBalance.text = if (r.balance.isNotBlank()) "余额 ${r.balance}" else ""
+                    binding.cardBalance.text =
+                        if (r.balance.isNotBlank()) getString(R.string.balance_format, r.balance) else ""
                     binding.cardQr.setImageBitmap(QrGenerator.encode(r.code, QrGenerator.SIZE_CARD))
-                    binding.cardHint.text = "点二维码进入全屏付款"
+                    binding.cardHint.text = getString(R.string.main_tap_qr)
                     adapter.submit(store.list(), store.currentIndex())
                     PayWidgetProvider.refreshAll(this@MainActivity)
                 }
                 is PayCodeRepository.Result.Invalid ->
-                    binding.cardHint.text = "凭证失效，请重新添加此卡"
+                    binding.cardHint.text = getString(R.string.main_invalid)
                 is PayCodeRepository.Result.Error ->
-                    binding.cardHint.text = "获取失败：${r.message}"
+                    binding.cardHint.text = getString(R.string.main_fetch_failed, r.message)
             }
         }
     }
@@ -109,21 +112,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAddDialog() {
         val input = android.widget.EditText(this).apply {
-            hint = "粘贴付款码链接"
+            hint = getString(R.string.add_dialog_hint)
         }
         AlertDialog.Builder(this)
-            .setTitle("添加校园卡")
-            .setMessage("从微信打开付款码页面，复制链接后粘贴到这里")
+            .setTitle(R.string.add_dialog_title)
+            .setMessage(R.string.add_dialog_message)
             .setView(input)
-            .setPositiveButton("添加") { _, _ -> addFromLink(input.text.toString()) }
-            .setNegativeButton("取消", null)
+            .setPositiveButton(R.string.add_action) { _, _ -> addFromLink(input.text.toString()) }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun addFromLink(link: String) {
         val parsed = LinkParser.parse(link)
         if (parsed == null) {
-            Toast.makeText(this, "链接里没找到 openid，请检查", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.add_no_openid, Toast.LENGTH_LONG).show()
             return
         }
         val account = Account(openid = parsed.openid, cardId = parsed.cardId)
@@ -138,12 +141,20 @@ class MainActivity : AppCompatActivity() {
                     renderCurrent()
                     adapter.submit(store.list(), store.currentIndex())
                     PayWidgetProvider.refreshAll(this@MainActivity)
-                    Toast.makeText(this@MainActivity, "已添加 ${account.displayName()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.add_success, account.displayName()),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 is PayCodeRepository.Result.Invalid ->
-                    Toast.makeText(this@MainActivity, "链接有效但取不到付款码，可能已失效", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, R.string.add_invalid, Toast.LENGTH_LONG).show()
                 is PayCodeRepository.Result.Error ->
-                    Toast.makeText(this@MainActivity, "验证失败：${r.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.add_verify_failed, r.message),
+                        Toast.LENGTH_LONG
+                    ).show()
             }
         }
     }
@@ -151,15 +162,15 @@ class MainActivity : AppCompatActivity() {
     private fun confirmRemove(index: Int) {
         val account = store.list().getOrNull(index) ?: return
         AlertDialog.Builder(this)
-            .setTitle("删除")
-            .setMessage("删除「${account.displayName()}」？")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle(R.string.remove_dialog_title)
+            .setMessage(getString(R.string.remove_dialog_message, account.displayName()))
+            .setPositiveButton(R.string.remove_action) { _, _ ->
                 store.removeAt(index)
                 renderCurrent()
                 adapter.submit(store.list(), store.currentIndex())
                 PayWidgetProvider.refreshAll(this)
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 }

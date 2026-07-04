@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/screen_bg">
@@ -13,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="后台保活"
+            android:text="@string/settings_keepalive_title"
             android:textColor="@color/text_dark"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -22,7 +23,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="不管选哪档，点开付款页永远实时拉最新码。"
+            android:text="@string/settings_keepalive_desc"
             android:textColor="@color/text_hint"
             android:textSize="13sp"
             android:layout_marginBottom="12dp" />
@@ -38,7 +39,7 @@
                 android:id="@+id/radioLite"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="省心档：后台定时刷新，无常驻通知"
+                android:text="@string/settings_mode_lite"
                 android:textSize="15sp"
                 android:paddingVertical="8dp" />
 
@@ -46,7 +47,7 @@
                 android:id="@+id/radioSteady"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="稳妥档：前台服务保活，每分钟刷新（通知栏有一条常驻低优先级通知）"
+                android:text="@string/settings_mode_steady"
                 android:textSize="15sp"
                 android:paddingVertical="8dp" />
         </RadioGroup>
@@ -54,7 +55,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="系统设置"
+            android:text="@string/settings_system_title"
             android:textColor="@color/text_dark"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -65,7 +66,7 @@
             android:id="@+id/batteryStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="未加入电池白名单"
+            tools:text="@string/settings_battery_off"
             android:textColor="@color/text_hint"
             android:textSize="13sp"
             android:layout_marginBottom="8dp" />
@@ -74,7 +75,7 @@
             android:id="@+id/btnBattery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="加入电池白名单"
+            android:text="@string/settings_battery_button"
             android:textColor="@color/text_light"
             android:background="@drawable/bg_button"
             android:layout_marginBottom="12dp" />
@@ -83,14 +84,14 @@
             android:id="@+id/btnAutostart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="打开自启动管理（小米/OPPO/vivo）"
+            android:text="@string/settings_autostart_button"
             android:textColor="@color/text_light"
             android:background="@drawable/bg_button" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="国产 ROM 的省电策略较强，建议同时开启电池白名单和自启动，后台刷新才稳。"
+            android:text="@string/settings_rom_hint"
             android:textColor="@color/text_hint"
             android:textSize="12sp"
             android:layout_marginTop="12dp" />
