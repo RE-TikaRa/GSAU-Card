@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:gravity="center_horizontal"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/payName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="姓名"
+        android:textColor="@color/text_dark"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/payBalance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text=""
+        android:textColor="@color/text_hint"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/payQr"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="40dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="付款码" />
+
+    <TextView
+        android:id="@+id/payHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="每分钟自动刷新，点二维码可手动刷新"
+        android:textColor="@color/text_hint"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/payRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="刷新付款码"
+        android:textColor="@color/text_light"
+        android:background="@drawable/bg_button"
+        android:paddingHorizontal="32dp" />
+</LinearLayout>

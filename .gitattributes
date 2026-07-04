@@ -1,0 +1,11 @@
+# 统一文本文件为 LF,避免跨平台换行符噪音
+* text=auto eol=lf
+
+# 脚本按平台
+*.bat text eol=crlf
+
+# 二进制文件不做换行转换
+*.png binary
+*.jar binary
+*.apk binary
+*.keystore binary

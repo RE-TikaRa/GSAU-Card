@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# 本地下载的 Gradle 发行版(仅用于本机首次构建,不进版本库)
+.gradle-dist/
+
+# 本地 SDK 路径,因机器而异
+local.properties
+
+# 构建产物
+*.apk
+*.aar
+*.ap_
+*.dex
+
+# OMC 运行状态
+.omc/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+captures/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log

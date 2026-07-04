@@ -1,0 +1,101 @@
+package com.tika.paycard.work
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import com.tika.paycard.R
+import com.tika.paycard.data.PayCodeManager
+import com.tika.paycard.widget.PayWidgetProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+
+/**
+ * 稳妥档保活:常驻前台服务,内部每 60 秒刷新一次当前账号并更新组件。
+ * 用低优先级通知,尽量不打扰。用户可在设置里关闭。
+ */
+class RefreshService : Service() {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var loopJob: Job? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        startForeground(NOTIF_ID, buildNotification())
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (loopJob?.isActive != true) {
+            loopJob = scope.launch {
+                while (isActive) {
+                    runCatching {
+                        PayCodeManager.refreshCurrent(applicationContext)
+                        PayWidgetProvider.refreshAll(applicationContext)
+                    }
+                    delay(INTERVAL_MS)
+                }
+            }
+        }
+        return START_STICKY
+    }
+
+    override fun onDestroy() {
+        scope.cancel()
+        super.onDestroy()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun buildNotification(): Notification {
+        val mgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "付款码保活",
+                NotificationManager.IMPORTANCE_MIN
+            ).apply {
+                description = "后台刷新付款码,保证组件上的码有效"
+                setShowBadge(false)
+            }
+            mgr.createNotificationChannel(channel)
+        }
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("甘农卡")
+            .setContentText("付款码后台刷新中")
+            .setSmallIcon(R.drawable.ic_notification)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
+            .setShowWhen(false)
+            .build()
+    }
+
+    companion object {
+        private const val CHANNEL_ID = "paycode_keepalive"
+        private const val NOTIF_ID = 1001
+        private const val INTERVAL_MS = 60_000L
+
+        fun start(context: Context) {
+            val intent = Intent(context, RefreshService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        }
+
+        fun stop(context: Context) {
+            context.stopService(Intent(context, RefreshService::class.java))
+        }
+    }
+}

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">甘农卡</string>
+    <string name="widget_label">甘农卡付款码</string>
+</resources>
