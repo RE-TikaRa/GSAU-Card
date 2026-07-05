@@ -17,6 +17,7 @@
     <string name="cd_add">添加</string>
     <string name="cd_settings">设置</string>
     <string name="cd_qr">付款码</string>
+    <string name="cd_refresh">刷新</string>
     <string name="cd_back">返回主页</string>
     <string name="pay_title">付款码</string>
 

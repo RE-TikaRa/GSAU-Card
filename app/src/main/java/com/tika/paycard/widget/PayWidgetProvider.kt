@@ -10,7 +10,11 @@ import android.widget.RemoteViews
 import com.tika.paycard.R
 import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.data.AccountStore
+import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.qr.QrGenerator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * 桌面组件:外层圆角卡 + 顶部姓名圆角条 + 下方大圆角二维码方块。
@@ -24,9 +28,22 @@ class PayWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_SWITCH) {
-            AccountStore.get(context).switchToNext()
-            refreshAll(context)
+        when (intent.action) {
+            ACTION_SWITCH -> {
+                AccountStore.get(context).switchToNext()
+                refreshAll(context)
+            }
+            ACTION_REFRESH -> {
+                val pending = goAsync()
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        PayCodeManager.refreshCurrent(context)
+                        refreshAll(context)
+                    } finally {
+                        pending.finish()
+                    }
+                }
+            }
         }
     }
 
@@ -57,6 +74,8 @@ class PayWidgetProvider : AppWidgetProvider() {
             // 点二维码/整体打开全屏付款页
             views.setOnClickPendingIntent(R.id.widget_qr, openPayIntent(context))
             views.setOnClickPendingIntent(R.id.widget_hint, openPayIntent(context))
+            // 点刷新按钮就地拉最新码
+            views.setOnClickPendingIntent(R.id.widget_refresh, refreshIntent(context))
         }
         manager.updateAppWidget(widgetId, views)
     }
@@ -78,11 +97,17 @@ class PayWidgetProvider : AppWidgetProvider() {
         return PendingIntent.getBroadcast(context, 2, intent, flags())
     }
 
+    private fun refreshIntent(context: Context): PendingIntent {
+        val intent = Intent(context, PayWidgetProvider::class.java).setAction(ACTION_REFRESH)
+        return PendingIntent.getBroadcast(context, 3, intent, flags())
+    }
+
     private fun flags(): Int =
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
     companion object {
         private const val ACTION_SWITCH = "com.tika.paycard.WIDGET_SWITCH"
+        private const val ACTION_REFRESH = "com.tika.paycard.WIDGET_REFRESH"
 
         /** 刷新所有已放置的组件 */
         fun refreshAll(context: Context) {
