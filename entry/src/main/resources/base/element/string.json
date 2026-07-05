@@ -73,10 +73,6 @@
       "value": "添加校园卡"
     },
     {
-      "name": "add_dialog_message",
-      "value": "从企业微信微信打开付款码页面，复制链接后粘贴到这里"
-    },
-    {
       "name": "add_dialog_hint",
       "value": "粘贴付款码链接"
     },
