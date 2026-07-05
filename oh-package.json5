@@ -1,0 +1,13 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "gsau-card",
+  "version": "1.0.0",
+  "description": "甘农卡付款码鸿蒙版",
+  "main": "",
+  "author": "亓翎_Re-TikaRa",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hypium": "1.0.19"
+  }
+}

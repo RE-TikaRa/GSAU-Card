@@ -1,0 +1,9 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/GuidePage",
+    "pages/PayPage",
+    "pages/SettingsPage",
+    "pages/AboutPage"
+  ]
+}

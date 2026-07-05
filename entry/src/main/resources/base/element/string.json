@@ -1,0 +1,352 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "甘农卡主模块"
+    },
+    {
+      "name": "ability_desc",
+      "value": "甘农卡"
+    },
+    {
+      "name": "app_name",
+      "value": "甘农卡"
+    },
+    {
+      "name": "widget_label",
+      "value": "甘农卡付款码"
+    },
+    {
+      "name": "balance_format",
+      "value": "余额 %s"
+    },
+    {
+      "name": "main_no_card",
+      "value": "未添加校园卡"
+    },
+    {
+      "name": "main_add_hint",
+      "value": "点右上角 + 粘贴付款码链接添加"
+    },
+    {
+      "name": "main_loading",
+      "value": "正在获取付款码…"
+    },
+    {
+      "name": "main_tap_qr",
+      "value": "点二维码进入全屏付款"
+    },
+    {
+      "name": "main_card_list_title",
+      "value": "我的卡片（点击切换，长按删除）"
+    },
+    {
+      "name": "main_invalid",
+      "value": "凭证失效，请重新添加此卡"
+    },
+    {
+      "name": "main_fetch_failed",
+      "value": "获取失败：%s"
+    },
+    {
+      "name": "cd_add",
+      "value": "添加"
+    },
+    {
+      "name": "cd_settings",
+      "value": "设置"
+    },
+    {
+      "name": "cd_qr",
+      "value": "付款码"
+    },
+    {
+      "name": "cd_back",
+      "value": "返回主页"
+    },
+    {
+      "name": "pay_title",
+      "value": "付款码"
+    },
+    {
+      "name": "add_dialog_title",
+      "value": "添加校园卡"
+    },
+    {
+      "name": "add_dialog_message",
+      "value": "从企业微信微信打开付款码页面，复制链接后粘贴到这里"
+    },
+    {
+      "name": "add_dialog_hint",
+      "value": "粘贴付款码链接"
+    },
+    {
+      "name": "add_action",
+      "value": "添加"
+    },
+    {
+      "name": "add_no_openid",
+      "value": "链接里没找到 openid，请检查"
+    },
+    {
+      "name": "add_invalid",
+      "value": "链接有效但取不到付款码，可能已失效"
+    },
+    {
+      "name": "add_verify_failed",
+      "value": "验证失败：%s"
+    },
+    {
+      "name": "add_success",
+      "value": "已添加 %s"
+    },
+    {
+      "name": "remove_dialog_title",
+      "value": "删除"
+    },
+    {
+      "name": "remove_dialog_message",
+      "value": "删除「%s」？"
+    },
+    {
+      "name": "remove_action",
+      "value": "删除"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "pay_no_card",
+      "value": "未添加账号"
+    },
+    {
+      "name": "pay_no_card_hint",
+      "value": "请先在主界面添加校园卡"
+    },
+    {
+      "name": "pay_refreshing",
+      "value": "刷新中…"
+    },
+    {
+      "name": "pay_auto_refresh",
+      "value": "每分钟自动刷新，点二维码可手动刷新"
+    },
+    {
+      "name": "pay_invalid",
+      "value": "凭证失效，请重新粘贴链接添加"
+    },
+    {
+      "name": "pay_refresh_failed",
+      "value": "刷新失败：%s"
+    },
+    {
+      "name": "pay_refresh_button",
+      "value": "刷新付款码"
+    },
+    {
+      "name": "widget_add_card",
+      "value": "点击添加校园卡"
+    },
+    {
+      "name": "widget_no_account",
+      "value": "未添加账号"
+    },
+    {
+      "name": "widget_tap_refresh",
+      "value": "点击刷新付款码"
+    },
+    {
+      "name": "settings_title",
+      "value": "设置"
+    },
+    {
+      "name": "settings_appearance_title",
+      "value": "外观"
+    },
+    {
+      "name": "settings_theme_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "settings_theme_light",
+      "value": "浅色模式"
+    },
+    {
+      "name": "settings_theme_dark",
+      "value": "深色模式"
+    },
+    {
+      "name": "settings_about_title",
+      "value": "关于软件"
+    },
+    {
+      "name": "about_title",
+      "value": "关于软件"
+    },
+    {
+      "name": "about_version",
+      "value": "版本 %s"
+    },
+    {
+      "name": "about_check_update",
+      "value": "检查更新"
+    },
+    {
+      "name": "about_checking",
+      "value": "正在检查更新…"
+    },
+    {
+      "name": "about_up_to_date",
+      "value": "已是最新版本"
+    },
+    {
+      "name": "about_check_failed",
+      "value": "检查失败：%s"
+    },
+    {
+      "name": "about_new_version_title",
+      "value": "发现新版本 %s"
+    },
+    {
+      "name": "about_new_version_message",
+      "value": "前往下载页更新，安装后覆盖当前版本即可。"
+    },
+    {
+      "name": "about_go_download",
+      "value": "去下载"
+    },
+    {
+      "name": "about_intro_title",
+      "value": "软件简介"
+    },
+    {
+      "name": "about_intro",
+      "value": "甘肃农业大学校园卡付款码的桌面组件，把付款码放到桌面，打开即用，自动刷新。"
+    },
+    {
+      "name": "about_contact_title",
+      "value": "联系我们"
+    },
+    {
+      "name": "about_contact_email",
+      "value": "邮箱"
+    },
+    {
+      "name": "about_contact_email_value",
+      "value": "163mail@re-tikara.fun"
+    },
+    {
+      "name": "about_contact_github",
+      "value": "GitHub"
+    },
+    {
+      "name": "about_contact_github_value",
+      "value": "亓翎_Re-TikaRa"
+    },
+    {
+      "name": "about_contact_bilibili",
+      "value": "哔哩哔哩"
+    },
+    {
+      "name": "about_contact_bilibili_value",
+      "value": "亓翎_Re-TikaRa"
+    },
+    {
+      "name": "about_contact_wechat",
+      "value": "微信公众号"
+    },
+    {
+      "name": "about_contact_wechat_value",
+      "value": "EmotionStudio"
+    },
+    {
+      "name": "about_wechat_copied",
+      "value": "已复制公众号名称，去微信搜索关注"
+    },
+    {
+      "name": "about_other_title",
+      "value": "其他"
+    },
+    {
+      "name": "about_license",
+      "value": "开源许可证"
+    },
+    {
+      "name": "about_privacy",
+      "value": "隐私政策"
+    },
+    {
+      "name": "about_agreement",
+      "value": "用户协议"
+    },
+    {
+      "name": "about_license_title",
+      "value": "开源许可证"
+    },
+    {
+      "name": "about_privacy_title",
+      "value": "隐私政策"
+    },
+    {
+      "name": "about_agreement_title",
+      "value": "用户协议"
+    },
+    {
+      "name": "about_privacy_content",
+      "value": "本软件不收集、不上传任何个人信息。付款码链接与凭证仅保存在本机，用于向学校服务器换取付款码，不经过任何第三方服务器。删除卡片即清除对应数据。"
+    },
+    {
+      "name": "about_agreement_content",
+      "value": "本软件为个人为兴趣编写的开源工具，按现状提供，不对可用性或适用性作任何担保。付款码由学校服务器实时下发，请自行确认金额与账户无误后使用。因使用本软件产生的任何后果由使用者自行承担。"
+    },
+    {
+      "name": "about_license_content",
+      "value": "本软件基于 Apache License 2.0 开源。\n\n你可以自由使用、修改、分发本软件，包括用于商业用途，前提是保留原始版权声明与许可证文本。软件按现状提供，不附带任何明示或暗示的担保。\n\n完整条款见项目根目录 LICENSE 文件。"
+    },
+    {
+      "name": "about_dialog_close",
+      "value": "知道了"
+    },
+    {
+      "name": "guide_title",
+      "value": "操作指引"
+    },
+    {
+      "name": "guide_intro",
+      "value": "按下面的步骤把甘农卡付款码放到桌面，之后打开即用。"
+    },
+    {
+      "name": "guide_step1_title",
+      "value": "1. 获取付款码链接（企业微信）"
+    },
+    {
+      "name": "guide_step1_body",
+      "value": "1. 打开企业微信。\n2. 打开一卡通付款码页面。\n3. 点击右上角 ···。\n4. 选择复制链接。"
+    },
+    {
+      "name": "guide_step2_title",
+      "value": "2. 绑定至甘农卡"
+    },
+    {
+      "name": "guide_step2_body",
+      "value": "1. 打开甘农卡。\n2. 点击右上角 +。\n3. 把刚刚复制的链接粘贴到输入框。\n4. 点击确定保存。"
+    },
+    {
+      "name": "guide_step3_title",
+      "value": "3. 添加桌面卡片"
+    },
+    {
+      "name": "guide_step3_body",
+      "value": "返回手机桌面，把甘农卡服务卡片添加到桌面，方便一键打开。\n\n在桌面长按甘农卡图标，选择服务卡片，把付款码卡片拖到桌面即可。\n\n找不到入口时，可在设置里搜索服务卡片查看官方说明。"
+    },
+    {
+      "name": "guide_start",
+      "value": "开始使用"
+    },
+    {
+      "name": "cd_guide_image",
+      "value": "操作截图"
+    }
+  ]
+}

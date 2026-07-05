@@ -1,0 +1,17 @@
+/node_modules
+/oh_modules
+/local.properties
+/.idea
+/build
+/.hvigor
+/.cxx
+/.clangd
+/.clang-format
+*.har
+**/build/
+**/oh_modules/
+/entry/.preview
+/entry/.test
+/.ohpm
+jscrash-*.txt
+*.log
