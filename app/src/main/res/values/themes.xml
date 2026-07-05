@@ -9,6 +9,7 @@
         <item name="colorOnSurface">@color/text_dark</item>
         <item name="colorOnSurfaceVariant">@color/text_hint</item>
         <item name="colorOutline">@color/outline</item>
+        <item name="colorNameBar">@color/name_bar</item>
         <item name="android:windowBackground">@color/screen_bg</item>
         <item name="android:colorBackground">@color/screen_bg</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.PayCard.Dialog</item>
@@ -46,5 +47,41 @@
         <item name="android:activityOpenExitAnimation">@anim/fade_out</item>
         <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <!-- 莫兰迪配色叠加：仅覆盖主色四项，切换后 recreate 生效 -->
+    <style name="ThemeOverlay.PayCard.GrayGreen" parent="">
+        <item name="colorPrimary">@color/gg_primary</item>
+        <item name="colorPrimaryDark">@color/gg_dark</item>
+        <item name="colorSecondary">@color/gg_accent</item>
+        <item name="colorNameBar">@color/gg_bar</item>
+    </style>
+
+    <style name="ThemeOverlay.PayCard.GrayBlue" parent="">
+        <item name="colorPrimary">@color/gb_primary</item>
+        <item name="colorPrimaryDark">@color/gb_dark</item>
+        <item name="colorSecondary">@color/gb_accent</item>
+        <item name="colorNameBar">@color/gb_bar</item>
+    </style>
+
+    <style name="ThemeOverlay.PayCard.LotusPink" parent="">
+        <item name="colorPrimary">@color/lp_primary</item>
+        <item name="colorPrimaryDark">@color/lp_dark</item>
+        <item name="colorSecondary">@color/lp_accent</item>
+        <item name="colorNameBar">@color/lp_bar</item>
+    </style>
+
+    <style name="ThemeOverlay.PayCard.Terracotta" parent="">
+        <item name="colorPrimary">@color/tc_primary</item>
+        <item name="colorPrimaryDark">@color/tc_dark</item>
+        <item name="colorSecondary">@color/tc_accent</item>
+        <item name="colorNameBar">@color/tc_bar</item>
+    </style>
+
+    <style name="ThemeOverlay.PayCard.GrayMauve" parent="">
+        <item name="colorPrimary">@color/gm_primary</item>
+        <item name="colorPrimaryDark">@color/gm_dark</item>
+        <item name="colorSecondary">@color/gm_accent</item>
+        <item name="colorNameBar">@color/gm_bar</item>
     </style>
 </resources>

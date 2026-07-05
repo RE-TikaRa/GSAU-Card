@@ -20,4 +20,30 @@
 
     <color name="scrim">#99000000</color>
 
+    <!-- 莫兰迪五套配色（深色，略提亮） -->
+    <color name="gg_primary">#84A697</color>
+    <color name="gg_dark">#6B8E7F</color>
+    <color name="gg_accent">#A3BDB0</color>
+    <color name="gg_bar">#4F6B5F</color>
+
+    <color name="gb_primary">#8497AF</color>
+    <color name="gb_dark">#6B7F97</color>
+    <color name="gb_accent">#A3B7CD</color>
+    <color name="gb_bar">#4F5F73</color>
+
+    <color name="lp_primary">#C9A3A8</color>
+    <color name="lp_dark">#B08A8F</color>
+    <color name="lp_accent">#DDC2C6</color>
+    <color name="lp_bar">#8A686D</color>
+
+    <color name="tc_primary">#C9A281</color>
+    <color name="tc_dark">#B08968</color>
+    <color name="tc_accent">#DDC2A3</color>
+    <color name="tc_bar">#8A6A4F</color>
+
+    <color name="gm_primary">#A397AF</color>
+    <color name="gm_dark">#8A7F97</color>
+    <color name="gm_accent">#BDB0CD</color>
+    <color name="gm_bar">#6B6173</color>
+
 </resources>

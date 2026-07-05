@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 姓名条底色，随配色主题切换 -->
+    <attr name="colorNameBar" format="color" />
+</resources>

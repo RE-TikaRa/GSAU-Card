@@ -20,4 +20,30 @@
 
     <color name="scrim">#66000000</color>
 
+    <!-- 莫兰迪五套配色（浅色）：灰绿 / 灰蓝 / 藕粉 / 陶土 / 灰紫 -->
+    <color name="gg_primary">#6B8E7F</color>
+    <color name="gg_dark">#4F6B5F</color>
+    <color name="gg_accent">#8FA99C</color>
+    <color name="gg_bar">#6B8E7F</color>
+
+    <color name="gb_primary">#6B7F97</color>
+    <color name="gb_dark">#4F5F73</color>
+    <color name="gb_accent">#90A4BA</color>
+    <color name="gb_bar">#6B7F97</color>
+
+    <color name="lp_primary">#B08A8F</color>
+    <color name="lp_dark">#8A686D</color>
+    <color name="lp_accent">#C9A9AD</color>
+    <color name="lp_bar">#B08A8F</color>
+
+    <color name="tc_primary">#B08968</color>
+    <color name="tc_dark">#8A6A4F</color>
+    <color name="tc_accent">#C9A98A</color>
+    <color name="tc_bar">#B08968</color>
+
+    <color name="gm_primary">#8A7F97</color>
+    <color name="gm_dark">#6B6173</color>
+    <color name="gm_accent">#A99CBA</color>
+    <color name="gm_bar">#8A7F97</color>
+
 </resources>
