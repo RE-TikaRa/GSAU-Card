@@ -11,7 +11,7 @@
     <color name="surface_variant">#262B26</color>
     <color name="outline">#3A403A</color>
     <color name="name_bar">#2E7D32</color>
-    <color name="qr_block">#FFFFFF</color>
+    <color name="qr_block">#D8D8D8</color>
 
     <color name="text_dark">#E6E6E6</color>
     <color name="text_hint">#9E9E9E</color>
@@ -20,7 +20,7 @@
 
     <color name="scrim">#99000000</color>
 
-    <!-- 二维码在深色下仍用浅底深矩阵 -->
+    <!-- 二维码深色下换浅灰底,压住纯白在暗背景上的刺眼感,黑矩阵对比仍足够扫 -->
     <color name="qr_foreground">#000000</color>
-    <color name="qr_background">#FFFFFF</color>
+    <color name="qr_background">#D8D8D8</color>
 </resources>

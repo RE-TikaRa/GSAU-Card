@@ -87,7 +87,7 @@
             android:layout_height="300dp"
             android:layout_marginTop="14dp"
             android:background="@drawable/bg_qr_block"
-            android:padding="16dp">
+            android:padding="24dp">
 
             <ImageView
                 android:id="@+id/cardQr"

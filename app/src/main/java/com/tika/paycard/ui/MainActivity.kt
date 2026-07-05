@@ -2,6 +2,7 @@ package com.tika.paycard.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import com.tika.paycard.databinding.ActivityMainBinding
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 
 /**
@@ -57,20 +59,32 @@ class MainActivity : AppCompatActivity() {
         adapter.submit(store.list(), store.currentIndex())
     }
 
+    private fun qrBackground() = ContextCompat.getColor(this, R.color.qr_background)
+
+    private fun showBalance(balance: String) {
+        if (balance.isNotBlank()) {
+            binding.cardBalance.text = getString(R.string.balance_format, balance)
+            binding.cardBalance.visibility = View.VISIBLE
+        } else {
+            binding.cardBalance.visibility = View.GONE
+        }
+    }
+
     private fun renderCurrent() {
         val account = store.current()
         if (account == null) {
             binding.cardName.text = getString(R.string.main_no_card)
-            binding.cardBalance.text = ""
+            binding.cardBalance.visibility = View.GONE
             binding.cardQr.setImageDrawable(null)
             binding.cardHint.text = getString(R.string.main_add_hint)
             return
         }
         binding.cardName.text = account.displayName()
-        binding.cardBalance.text =
-            if (account.balance.isNotBlank()) getString(R.string.balance_format, account.balance) else ""
+        showBalance(account.balance)
         if (account.cachedCode.isNotBlank()) {
-            binding.cardQr.setImageBitmap(QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD))
+            binding.cardQr.setImageBitmap(
+                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD, background = qrBackground())
+            )
             binding.cardHint.text = getString(R.string.main_tap_qr)
         } else {
             binding.cardHint.text = getString(R.string.main_loading)
@@ -86,9 +100,10 @@ class MainActivity : AppCompatActivity() {
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
                     binding.cardName.text = account.displayName()
-                    binding.cardBalance.text =
-                        if (r.balance.isNotBlank()) getString(R.string.balance_format, r.balance) else ""
-                    binding.cardQr.setImageBitmap(QrGenerator.encode(r.code, QrGenerator.SIZE_CARD))
+                    showBalance(r.balance)
+                    binding.cardQr.setImageBitmap(
+                        QrGenerator.encode(r.code, QrGenerator.SIZE_CARD, background = qrBackground())
+                    )
                     binding.cardHint.text = getString(R.string.main_tap_qr)
                     adapter.submit(store.list(), store.currentIndex())
                     PayWidgetProvider.refreshAll(this@MainActivity)
