@@ -68,7 +68,7 @@
             android:background="@drawable/bg_dialog_text_button"
             android:paddingHorizontal="18dp"
             android:paddingVertical="10dp"
-            android:textColor="@color/primary"
+            android:textColor="?attr/colorPrimary"
             android:textSize="15sp"
             android:textStyle="bold"
             android:clickable="true"
