@@ -64,7 +64,7 @@ object UpdateChecker {
         return 0
     }
 
-    private const val PROXY = "https://gh-proxy.lgq3218483753.workers.dev"
+    private const val PROXY = "https://gh.re-tikara.fun"
     private const val LATEST = "$PROXY/api/repos/RE-TikaRa/GSAU-Card/releases/latest"
     private val TAG_RE = Regex(""""tag_name"\s*:\s*"([^"]+)"""")
     private val APK_RE = Regex(""""browser_download_url"\s*:\s*"([^"]+\.apk)"""")
