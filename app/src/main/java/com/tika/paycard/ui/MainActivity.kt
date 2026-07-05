@@ -16,7 +16,6 @@ import com.tika.paycard.databinding.ActivityMainBinding
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
-import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 
 /**
@@ -68,8 +67,6 @@ class MainActivity : AppCompatActivity() {
         adapter.submit(store.list(), store.currentIndex())
     }
 
-    private fun qrBackground() = ContextCompat.getColor(this, R.color.qr_background)
-
     private fun showBalance(balance: String) {
         if (balance.isNotBlank()) {
             binding.cardBalance.text = getString(R.string.balance_format, balance)
@@ -92,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         showBalance(account.balance)
         if (account.cachedCode.isNotBlank()) {
             binding.cardQr.setImageBitmap(
-                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD, background = qrBackground())
+                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD)
             )
             binding.cardHint.text = getString(R.string.main_tap_qr)
         } else {
@@ -111,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                     binding.cardName.text = account.displayName()
                     showBalance(r.balance)
                     binding.cardQr.setImageBitmap(
-                        QrGenerator.encode(r.code, QrGenerator.SIZE_CARD, background = qrBackground())
+                        QrGenerator.encode(r.code, QrGenerator.SIZE_CARD)
                     )
                     binding.cardHint.text = getString(R.string.main_tap_qr)
                     adapter.submit(store.list(), store.currentIndex())

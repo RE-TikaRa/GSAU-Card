@@ -21,7 +21,7 @@ object QrGenerator {
         content: String,
         size: Int,
         foreground: Int = Color.BLACK,
-        background: Int = Color.WHITE
+        background: Int = Color.TRANSPARENT
     ): Bitmap {
         val hints = mapOf(
             EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,

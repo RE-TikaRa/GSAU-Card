@@ -20,7 +20,4 @@
 
     <color name="scrim">#66000000</color>
 
-    <!-- 二维码永远深色矩阵 / 浅色底，保证任意主题下可扫 -->
-    <color name="qr_foreground">#000000</color>
-    <color name="qr_background">#FFFFFF</color>
 </resources>

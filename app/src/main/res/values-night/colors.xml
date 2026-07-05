@@ -20,7 +20,4 @@
 
     <color name="scrim">#99000000</color>
 
-    <!-- 二维码深色下换浅灰底,压住纯白在暗背景上的刺眼感,黑矩阵对比仍足够扫 -->
-    <color name="qr_foreground">#000000</color>
-    <color name="qr_background">#D8D8D8</color>
 </resources>

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.tika.paycard.R
 import com.tika.paycard.data.AccountStore
@@ -61,8 +60,6 @@ class PayActivity : AppCompatActivity() {
         loopJob?.cancel()
     }
 
-    private fun qrBackground() = ContextCompat.getColor(this, R.color.qr_background)
-
     private fun showCached() {
         val account = AccountStore.get(this).current()
         if (account == null) {
@@ -75,7 +72,7 @@ class PayActivity : AppCompatActivity() {
             if (account.balance.isNotBlank()) getString(R.string.balance_format, account.balance) else ""
         if (account.cachedCode.isNotBlank()) {
             binding.payQr.setImageBitmap(
-                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_FULLSCREEN, background = qrBackground())
+                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_FULLSCREEN)
             )
         }
     }
@@ -100,7 +97,7 @@ class PayActivity : AppCompatActivity() {
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
                     binding.payQr.setImageBitmap(
-                        QrGenerator.encode(r.code, QrGenerator.SIZE_FULLSCREEN, background = qrBackground())
+                        QrGenerator.encode(r.code, QrGenerator.SIZE_FULLSCREEN)
                     )
                     binding.payName.text = account.displayName()
                     binding.payBalance.text =
