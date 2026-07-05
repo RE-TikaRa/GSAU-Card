@@ -1,8 +1,13 @@
 package com.tika.paycard.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.tika.paycard.R
 import com.tika.paycard.databinding.ActivitySettingsBinding
 import com.tika.paycard.work.KeepAlive
@@ -13,6 +18,9 @@ import com.tika.paycard.work.KeepAlive
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
+
+    private val notificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +46,10 @@ class SettingsActivity : AppCompatActivity() {
 
         when (KeepAlive.getMode(this)) {
             KeepAlive.Mode.LITE -> binding.radioLite.isChecked = true
-            KeepAlive.Mode.STEADY -> binding.radioSteady.isChecked = true
+            KeepAlive.Mode.STEADY -> {
+                binding.radioSteady.isChecked = true
+                ensureNotificationPermission()
+            }
         }
 
         binding.modeGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -47,6 +58,7 @@ class SettingsActivity : AppCompatActivity() {
                 else -> KeepAlive.Mode.LITE
             }
             KeepAlive.setMode(this, mode)
+            if (mode == KeepAlive.Mode.STEADY) ensureNotificationPermission()
             val tip = if (mode == KeepAlive.Mode.STEADY)
                 R.string.settings_mode_steady_tip
             else
@@ -63,6 +75,13 @@ class SettingsActivity : AppCompatActivity() {
         binding.btnAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
+    }
+
+    private fun ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        if (!granted) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onResume() {
