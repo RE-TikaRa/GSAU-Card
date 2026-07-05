@@ -82,18 +82,18 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupColorSwatches() {
-        val swatches = mapOf(
-            binding.swatchGrayGreen to ColorManager.Scheme.GRAY_GREEN,
-            binding.swatchGrayBlue to ColorManager.Scheme.GRAY_BLUE,
-            binding.swatchLotusPink to ColorManager.Scheme.LOTUS_PINK,
-            binding.swatchTerracotta to ColorManager.Scheme.TERRACOTTA,
-            binding.swatchGrayMauve to ColorManager.Scheme.GRAY_MAUVE
+        val swatches = listOf(
+            Triple(binding.swatchGrayGreen, binding.dotGrayGreen, ColorManager.Scheme.GRAY_GREEN),
+            Triple(binding.swatchGrayBlue, binding.dotGrayBlue, ColorManager.Scheme.GRAY_BLUE),
+            Triple(binding.swatchLotusPink, binding.dotLotusPink, ColorManager.Scheme.LOTUS_PINK),
+            Triple(binding.swatchTerracotta, binding.dotTerracotta, ColorManager.Scheme.TERRACOTTA),
+            Triple(binding.swatchGrayMauve, binding.dotGrayMauve, ColorManager.Scheme.GRAY_MAUVE)
         )
         val current = ColorManager.getScheme(this)
-        swatches.forEach { (view, scheme) ->
-            view.foreground = if (scheme == current)
+        swatches.forEach { (hit, dot, scheme) ->
+            dot.foreground = if (scheme == current)
                 ContextCompat.getDrawable(this, R.drawable.swatch_ring_on) else null
-            view.setOnClickListener {
+            hit.setOnClickListener {
                 if (scheme != ColorManager.getScheme(this)) {
                     ColorManager.setScheme(this, scheme)
                     PayWidgetProvider.refreshAll(this)

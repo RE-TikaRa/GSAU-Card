@@ -99,60 +99,65 @@
                 <FrameLayout
                     android:id="@+id/swatchGrayGreen"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:padding="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/dotGrayGreen"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/swatch_gg" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/swatchGrayBlue"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:padding="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/dotGrayBlue"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/swatch_gb" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/swatchLotusPink"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:padding="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/dotLotusPink"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/swatch_lp" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/swatchTerracotta"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:padding="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/dotTerracotta"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/swatch_tc" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/swatchGrayMauve"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:padding="6dp">
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
                     <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/dotGrayMauve"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:background="@drawable/swatch_gm" />
                 </FrameLayout>
             </LinearLayout>
