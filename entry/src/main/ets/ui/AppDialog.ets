@@ -1,4 +1,4 @@
-import { promptAction, UIContext } from '@kit.ArkUI';
+import { ComponentContent, promptAction, UIContext } from '@kit.ArkUI';
 
 /**
  * 应用内弹窗集合。对齐安卓四种交互:
@@ -154,28 +154,23 @@ export class AppDialog {
     onConfirm: () => void
   ): void {
     const prompt = ui.getPromptAction();
-    let dialogId: number = 0;
     const params: ConfirmParams = {
       title,
       message,
       confirmText,
       cancelText,
       onConfirm: () => {
-        prompt.closeCustomDialog(dialogId);
+        prompt.closeCustomDialog(content);
         onConfirm();
       },
       onCancel: () => {
-        prompt.closeCustomDialog(dialogId);
+        prompt.closeCustomDialog(content);
       }
     };
-    prompt.openCustomDialog({
-      builder: () => {
-        confirmLayout(params);
-      },
+    const content = new ComponentContent(ui, wrapBuilder(confirmLayout), params);
+    prompt.openCustomDialog(content, {
       alignment: DialogAlignment.Center,
       autoCancel: true
-    }).then((id: number) => {
-      dialogId = id;
     });
   }
 
@@ -188,7 +183,6 @@ export class AppDialog {
     onConfirm: (text: string) => void
   ): void {
     const prompt = ui.getPromptAction();
-    let dialogId: number = 0;
     const holder: TextHolder = new TextHolder();
     const params: InputParams = {
       title,
@@ -197,43 +191,34 @@ export class AppDialog {
       cancelText,
       holder,
       onConfirm: () => {
-        prompt.closeCustomDialog(dialogId);
+        prompt.closeCustomDialog(content);
         onConfirm(holder.text);
       },
       onCancel: () => {
-        prompt.closeCustomDialog(dialogId);
+        prompt.closeCustomDialog(content);
       }
     };
-    prompt.openCustomDialog({
-      builder: () => {
-        inputLayout(params);
-      },
+    const content = new ComponentContent(ui, wrapBuilder(inputLayout), params);
+    prompt.openCustomDialog(content, {
       alignment: DialogAlignment.Center,
       autoCancel: true
-    }).then((id: number) => {
-      dialogId = id;
     });
   }
 
   static message(ui: UIContext, title: string, content: string, closeText: string): void {
     const prompt = ui.getPromptAction();
-    let dialogId: number = 0;
     const params: MessageParams = {
       title,
       content,
       closeText,
       onClose: () => {
-        prompt.closeCustomDialog(dialogId);
+        prompt.closeCustomDialog(node);
       }
     };
-    prompt.openCustomDialog({
-      builder: () => {
-        messageLayout(params);
-      },
+    const node = new ComponentContent(ui, wrapBuilder(messageLayout), params);
+    prompt.openCustomDialog(node, {
       alignment: DialogAlignment.Center,
       autoCancel: true
-    }).then((id: number) => {
-      dialogId = id;
     });
   }
 }
