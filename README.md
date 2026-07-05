@@ -15,6 +15,7 @@
   - 省心档：WorkManager 定时刷新，无常驻通知。
   - 稳妥档：前台服务每分钟刷新，通知栏一条低优先级常驻通知。
 - **国产 ROM 适配**：设置页一键跳转电池白名单和小米/OPPO/vivo 自启动管理。
+- **关于软件**：设置页进关于页，含版本号、简介、联系方式（邮箱/GitHub/哔哩哔哩/微信公众号）与开源许可证、隐私政策、用户协议。
 
 ## 架构
 
@@ -36,8 +37,9 @@ com.tika.paycard
     ├── MainActivity       主界面：当前卡 + 账号列表
     ├── PayActivity        全屏付款页
     ├── SettingsActivity   设置（含主题切换）
+    ├── AboutActivity      关于软件：版本、简介、联系方式、许可证与政策
     ├── AccountAdapter     账号列表适配器
-    ├── AppDialog          应用内统一弹窗（输入/确认）
+    ├── AppDialog          应用内统一弹窗（输入/确认/文本/轻提示）
     └── ThemeManager       主题档位持久化与应用
 
 PayCardApp（Application）冷启动时应用已保存的主题档位。

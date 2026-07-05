@@ -3,6 +3,7 @@ package com.tika.paycard.ui
 import android.app.Dialog
 import android.content.Context
 import android.text.InputType
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
@@ -57,6 +58,24 @@ object AppDialog {
             }
             binding.dialogNegative.setOnClickListener { dismiss() }
             binding.dialogInput.requestFocus()
+        }
+    }
+
+    /** 文本类弹窗:标题 + 长文正文(可滚动) + 单个关闭按钮,用于展示条款、许可证等。 */
+    fun message(
+        context: Context,
+        title: CharSequence,
+        message: CharSequence,
+        closeText: CharSequence
+    ) {
+        build(context) { binding, dismiss ->
+            binding.dialogTitle.text = title
+            binding.dialogMessage.text = message
+            binding.dialogMessage.movementMethod = ScrollingMovementMethod()
+            binding.dialogMessage.maxLines = 14
+            binding.dialogNegative.visibility = View.GONE
+            binding.dialogPositive.text = closeText
+            binding.dialogPositive.setOnClickListener { dismiss() }
         }
     }
 

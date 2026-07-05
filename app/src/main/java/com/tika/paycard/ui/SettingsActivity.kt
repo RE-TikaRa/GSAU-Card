@@ -1,5 +1,6 @@
 package com.tika.paycard.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.tika.paycard.R
@@ -58,6 +59,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.btnAutostart.setOnClickListener {
             KeepAlive.openAutoStartSettings(this)
+        }
+        binding.btnAbout.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
         }
     }
 

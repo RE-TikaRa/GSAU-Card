@@ -73,4 +73,39 @@
     <string name="notif_channel_name">付款码保活</string>
     <string name="notif_channel_desc">后台刷新付款码，保证组件上的码有效</string>
     <string name="notif_content">付款码后台刷新中</string>
+
+    <!-- 关于软件 -->
+    <string name="settings_about_title">关于软件</string>
+    <string name="about_title">关于软件</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_check_update">检查更新</string>
+    <string name="about_checking">正在检查更新…</string>
+    <string name="about_up_to_date">已是最新版本</string>
+    <string name="about_check_failed">检查失败：%1$s</string>
+    <string name="about_new_version_title">发现新版本 %1$s</string>
+    <string name="about_new_version_message">前往下载页更新，安装后覆盖当前版本即可。</string>
+    <string name="about_go_download">去下载</string>
+    <string name="about_intro_title">软件简介</string>
+    <string name="about_intro">甘肃农业大学校园卡付款码的桌面组件，把付款码放到桌面，打开即用，自动刷新。</string>
+    <string name="about_contact_title">联系我们</string>
+    <string name="about_contact_email">邮箱</string>
+    <string name="about_contact_email_value">163mail@re-tikara.fun</string>
+    <string name="about_contact_github">GitHub</string>
+    <string name="about_contact_github_value">亓翎_Re-TikaRa</string>
+    <string name="about_contact_bilibili">哔哩哔哩</string>
+    <string name="about_contact_bilibili_value">亓翎_Re-TikaRa</string>
+    <string name="about_contact_wechat">微信公众号</string>
+    <string name="about_contact_wechat_value">EmotionStudio</string>
+    <string name="about_wechat_copied">已复制公众号名称，去微信搜索关注</string>
+    <string name="about_other_title">其他</string>
+    <string name="about_license">开源许可证</string>
+    <string name="about_privacy">隐私政策</string>
+    <string name="about_agreement">用户协议</string>
+    <string name="about_license_title">开源许可证</string>
+    <string name="about_privacy_title">隐私政策</string>
+    <string name="about_agreement_title">用户协议</string>
+    <string name="about_privacy_content">本软件不收集、不上传任何个人信息。付款码链接与凭证仅保存在本机，用于向学校服务器换取付款码，不经过任何第三方服务器。删除卡片即清除对应数据。</string>
+    <string name="about_agreement_content">本软件为个人为兴趣编写的开源工具，按现状提供，不对可用性或适用性作任何担保。付款码由学校服务器实时下发，请自行确认金额与账户无误后使用。因使用本软件产生的任何后果由使用者自行承担。</string>
+    <string name="about_license_content">本软件基于 Apache License 2.0 开源。\n\n你可以自由使用、修改、分发本软件，包括用于商业用途，前提是保留原始版权声明与许可证文本。软件按现状提供，不附带任何明示或暗示的担保。\n\n完整条款见项目根目录 LICENSE 文件。</string>
+    <string name="about_dialog_close">知道了</string>
 </resources>

@@ -35,6 +35,11 @@
             android:exported="false"
             android:label="@string/settings_title" />
 
+        <activity
+            android:name=".ui.AboutActivity"
+            android:exported="false"
+            android:label="@string/about_title" />
+
         <service
             android:name=".work.RefreshService"
             android:exported="false"
