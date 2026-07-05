@@ -10,6 +10,7 @@
 - **全屏付款页**：打开即实时拉最新码，自动提亮屏幕，每 60 秒刷新。不依赖后台，付款那一刻的码一定新鲜。
 - **多账号**：粘贴付款码链接添加多张卡，App 和组件都能切换。
 - **深色模式**：支持浅色、深色、跟随系统三档，设置页手动切换，冷启动即生效。所有界面走主题变量，弹窗、列表、卡片、输入框同步适配。
+- **主题配色**：五套莫兰迪配色（灰绿、灰蓝、藕粉、陶土、灰紫），设置页点色点即换，App 各页与桌面组件同步换色。走主题叠加层，切换后当前页重绘生效。
 - **统一视觉**：Tabler 描边图标（返回/添加/删除/编辑/设置/刷新等），应用内自定义 Dialog 替代系统原生弹窗，轻提示走 Material Snackbar 跟随主题，二级页统一顶栏一键返回主页。
 - **保活两档**：
   - 省心档：WorkManager 定时刷新，无常驻通知。
@@ -44,12 +45,15 @@ com.tika.paycard
     ├── GuideActivity      首启操作引导：分步图文 + 远程截图
     ├── AccountAdapter     账号列表适配器
     ├── AppDialog          应用内统一弹窗（输入/确认/文本/轻提示）
-    └── ThemeManager       主题档位持久化与应用
+    ├── ThemeManager       主题档位（浅色/深色/跟随系统）持久化与应用
+    └── ColorManager       配色档位（五套莫兰迪）持久化,叠加主题层与组件配色
 
 PayCardApp（Application）冷启动时应用已保存的主题档位。
 ```
 
 界面统一走主题变量：`res/values/colors.xml` 定义语义色（surface / outline / text_* 等），`res/values-night/colors.xml` 提供深色版本，drawable 与布局一律引用 `@color` 而非字面量。二维码矩阵固定黑白，任意主题下都清晰可扫。
+
+配色不动 `@color` 常量，改走主题属性。base 主题 `Theme.PayCard` 定义 `colorPrimary` 等主色，五套配色各是一个 `ThemeOverlay.PayCard.*` 叠加层，只覆盖主色几项。每个 Activity 在 `setContentView` 之前调 `ColorManager.applyOverlay(this)` 把选中层叠上去，切换时 `recreate()` 重绘。桌面组件走 RemoteViews 吃不到主题属性，改用每套预置的固定色 drawable，按档位 `setBackgroundResource` 上色。
 
 付款码内容 = 页面 `id="code"` 隐藏字段里的 32 位十六进制串，服务端每次请求都会轮换。App 把它渲染成二维码，商户扫到的内容与官方页面完全一致。
 
@@ -95,13 +99,13 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 git push origin main
 
 # 2. 打新 tag（版本号递增，别复用旧 tag）
-git tag v1.1
+git tag v1.4
 
 # 3. 推 tag，触发 Actions 构建
-git push origin v1.1
+git push origin v1.4
 ```
 
-推上去后 Actions 会：签名打包 `assembleRelease` → 产物重命名成 `GSAU-Card-v1.1.apk` → 建对应 Release 并自动生成更新日志。构建进度和结果在仓库 Actions 页看。
+推上去后 Actions 会：签名打包 `assembleRelease` → 产物重命名成 `GSAU-Card-v1.4.apk` → 建对应 Release 并自动生成更新日志。构建进度和结果在仓库 Actions 页看。
 
 几点约束：
 
