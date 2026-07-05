@@ -18,9 +18,10 @@
         android:paddingHorizontal="6dp"
         android:paddingVertical="6dp">
 
-        <View
+        <ImageView
             android:layout_width="32dp"
-            android:layout_height="32dp" />
+            android:layout_height="32dp"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:id="@+id/widget_name"
