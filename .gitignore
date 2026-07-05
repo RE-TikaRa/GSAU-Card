@@ -16,3 +16,4 @@
 jscrash-*.txt
 *.log
 /build-profile.json5
+/.omc
