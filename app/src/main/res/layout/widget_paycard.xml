@@ -8,20 +8,40 @@
     android:background="@drawable/bg_card"
     android:padding="10dp">
 
-    <TextView
-        android:id="@+id/widget_name"
+    <LinearLayout
+        android:id="@+id/widget_name_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:background="@drawable/widget_name_gg"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="10dp"
-        tools:text="姓名"
-        android:textColor="@color/text_light"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:singleLine="true"
-        android:ellipsize="end" />
+        android:paddingStart="16dp"
+        android:paddingEnd="6dp"
+        android:paddingVertical="6dp">
+
+        <TextView
+            android:id="@+id/widget_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:text="姓名"
+            android:textColor="@color/text_light"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <ImageView
+            android:id="@+id/widget_refresh"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_refresh_gg"
+            android:padding="7dp"
+            android:src="@drawable/ic_refresh"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/cd_refresh" />
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -47,16 +67,5 @@
             android:textColor="@color/text_hint"
             android:textSize="13sp"
             android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/widget_refresh"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="bottom|end"
-            android:background="@drawable/widget_refresh_gg"
-            android:padding="8dp"
-            android:src="@drawable/ic_refresh"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/cd_refresh" />
     </FrameLayout>
 </LinearLayout>

@@ -51,7 +51,7 @@ class PayWidgetProvider : AppWidgetProvider() {
     private fun renderWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
         val views = RemoteViews(context.packageName, R.layout.widget_paycard)
         val scheme = ColorManager.getScheme(context)
-        views.setInt(R.id.widget_name, "setBackgroundResource", scheme.widgetName)
+        views.setInt(R.id.widget_name_bar, "setBackgroundResource", scheme.widgetName)
         views.setInt(R.id.widget_refresh, "setBackgroundResource", scheme.widgetRefresh)
         val account = AccountStore.get(context).current()
 
