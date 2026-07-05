@@ -15,7 +15,8 @@
   - 省心档：WorkManager 定时刷新，无常驻通知。
   - 稳妥档：前台服务每分钟刷新，通知栏一条低优先级常驻通知。
 - **国产 ROM 适配**：设置页一键跳转电池白名单和小米/OPPO/vivo 自启动管理。
-- **关于软件**：设置页进关于页，含版本号、简介、联系方式（邮箱/GitHub/哔哩哔哩/微信公众号）与开源许可证、隐私政策、用户协议。
+- **关于软件**：设置页进关于页，含版本号、简介、联系方式（邮箱/GitHub/哔哩哔哩/微信公众号）与开源许可证、隐私政策、用户协议，以及检查更新（读 GitHub Releases，有新版拉起浏览器去下载页）。
+- **首启引导**：第一次打开弹操作指引页，图文分步讲绑定付款码链接和添加桌面卡片，截图走反代远程加载，看完点开始使用进主界面。
 
 ## 架构
 
@@ -26,7 +27,9 @@ com.tika.paycard
 │   ├── AccountStore       多账号存储（SharedPreferences）
 │   ├── LinkParser         从链接解析 openid/id
 │   ├── PayCodeRepository  抓取页面并解析付款码内容
-│   └── PayCodeManager     刷新协调：抓取 → 回填缓存 → 通知组件
+│   ├── PayCodeManager     刷新协调：抓取 → 回填缓存 → 通知组件
+│   ├── UpdateChecker      读 GitHub Releases 比对版本，走反代
+│   └── ImageLoader        引导页远程截图加载（OkHttp + 内存缓存）
 ├── qr/            QrGenerator：ZXing 渲染二维码
 ├── widget/        PayWidgetProvider：桌面组件
 ├── work/          后台
@@ -38,6 +41,7 @@ com.tika.paycard
     ├── PayActivity        全屏付款页
     ├── SettingsActivity   设置（含主题切换）
     ├── AboutActivity      关于软件：版本、简介、联系方式、许可证与政策
+    ├── GuideActivity      首启操作引导：分步图文 + 远程截图
     ├── AccountAdapter     账号列表适配器
     ├── AppDialog          应用内统一弹窗（输入/确认/文本/轻提示）
     └── ThemeManager       主题档位持久化与应用
@@ -74,6 +78,36 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 2. 打开 App，点右上角 +，粘贴从微信付款码页面复制的链接。
 3. 长按桌面添加「甘农卡付款码」组件。
 4. 建议进设置页开启电池白名单和自启动，后台刷新才稳。
+
+## 发布新版本
+
+发版全自动，推一个 `v` 开头的 tag 即触发 `.github/workflows/release.yml` 打包发布，代码本身不用改版本号。
+
+版本号从 tag 自动推导：
+
+- `versionName` = tag 去掉前缀 `v`（`v1.1` → `1.1`），写在 Release 页和「关于软件」里。
+- `versionCode` = Actions 的 run_number，每跑一次自动递增，无需手动维护。
+
+发布步骤：
+
+```bash
+# 1. 确保要发布的代码已提交并推到 main
+git push origin main
+
+# 2. 打新 tag（版本号递增，别复用旧 tag）
+git tag v1.1
+
+# 3. 推 tag，触发 Actions 构建
+git push origin v1.1
+```
+
+推上去后 Actions 会：签名打包 `assembleRelease` → 产物重命名成 `GSAU-Card-v1.1.apk` → 建对应 Release 并自动生成更新日志。构建进度和结果在仓库 Actions 页看。
+
+几点约束：
+
+- 签名走 CI 里的固定 keystore（`secrets.KEYSTORE_BASE64` 等），全程一致，用户才能覆盖安装、保留已添加的卡。这些 Secret 换了会导致签名变化，务必别动。
+- tag 名单调递增（`v1.1`、`v1.2`…），已用过的不要复用。
+- 引导页截图走 Cloudflare Worker 反代（`worker/gh-proxy.js`），改过 Worker 要重新部署才生效，否则新版引导页图片拉不到。
 
 ## 已知限制
 
