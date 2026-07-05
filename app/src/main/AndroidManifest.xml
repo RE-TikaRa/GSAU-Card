@@ -40,6 +40,11 @@
             android:exported="false"
             android:label="@string/about_title" />
 
+        <activity
+            android:name=".ui.GuideActivity"
+            android:exported="false"
+            android:label="@string/guide_title" />
+
         <service
             android:name=".work.RefreshService"
             android:exported="false"

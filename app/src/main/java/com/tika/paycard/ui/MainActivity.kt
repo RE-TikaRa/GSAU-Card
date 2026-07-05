@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         store = AccountStore.get(this)
 
+        maybeShowGuide()
+
         adapter = AccountAdapter(
             onClick = { index -> selectAccount(index) },
             onLongClick = { index -> confirmRemove(index) }
@@ -51,6 +53,13 @@ class MainActivity : AppCompatActivity() {
 
         // 首次启动按当前档位拉起保活
         KeepAlive.apply(this)
+    }
+
+    private fun maybeShowGuide() {
+        val prefs = getSharedPreferences(PREFS_GUIDE, MODE_PRIVATE)
+        if (prefs.getBoolean(KEY_GUIDE_SHOWN, false)) return
+        prefs.edit().putBoolean(KEY_GUIDE_SHOWN, true).apply()
+        startActivity(Intent(this, GuideActivity::class.java))
     }
 
     override fun onResume() {
@@ -176,5 +185,10 @@ class MainActivity : AppCompatActivity() {
                 PayWidgetProvider.refreshAll(this)
             }
         )
+    }
+
+    companion object {
+        private const val PREFS_GUIDE = "paycard_guide"
+        private const val KEY_GUIDE_SHOWN = "guide_shown"
     }
 }

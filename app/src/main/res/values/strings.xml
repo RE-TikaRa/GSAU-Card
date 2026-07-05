@@ -108,4 +108,16 @@
     <string name="about_agreement_content">本软件为个人为兴趣编写的开源工具，按现状提供，不对可用性或适用性作任何担保。付款码由学校服务器实时下发，请自行确认金额与账户无误后使用。因使用本软件产生的任何后果由使用者自行承担。</string>
     <string name="about_license_content">本软件基于 Apache License 2.0 开源。\n\n你可以自由使用、修改、分发本软件，包括用于商业用途，前提是保留原始版权声明与许可证文本。软件按现状提供，不附带任何明示或暗示的担保。\n\n完整条款见项目根目录 LICENSE 文件。</string>
     <string name="about_dialog_close">知道了</string>
+
+    <!-- 首启操作引导 -->
+    <string name="guide_title">操作指引</string>
+    <string name="guide_intro">按下面的步骤把甘农卡付款码放到桌面，之后打开即用。</string>
+    <string name="guide_step1_title">1. 获取付款码链接（企业微信）</string>
+    <string name="guide_step1_body">1. 打开企业微信。\n2. 打开一卡通付款码页面。\n3. 点击右上角 ···。\n4. 选择复制链接。</string>
+    <string name="guide_step2_title">2. 绑定至甘农卡</string>
+    <string name="guide_step2_body">1. 打开甘农卡。\n2. 点击右上角 +。\n3. 把刚刚复制的链接粘贴到输入框。\n4. 点击确定保存。</string>
+    <string name="guide_step3_title">3. 添加桌面卡片</string>
+    <string name="guide_step3_body">返回手机桌面，把甘农卡小组件添加到桌面，方便一键打开。不同品牌路径略有区别：\n\n小米 / Redmi：长按桌面空白处 → 添加小部件 → 搜索甘农卡 → 添加。\n\nOPPO / OnePlus：捏合桌面 → 卡片 → 全部卡片 → 插件 → 甘农卡 → 拖到桌面。\n\nvivo / iQOO：捏合桌面 → 原子组件 / 微件 / 桌面挂件 → 甘农卡 → 拖到桌面。\n\n找不到入口时，可在手机设置里搜索桌面小组件、服务卡片或微件查看官方说明。</string>
+    <string name="guide_start">开始使用</string>
+    <string name="cd_guide_image">操作截图</string>
 </resources>
