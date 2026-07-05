@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.tika.paycard.R
+import com.tika.paycard.ui.ColorManager
 import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
@@ -49,6 +50,9 @@ class PayWidgetProvider : AppWidgetProvider() {
 
     private fun renderWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
         val views = RemoteViews(context.packageName, R.layout.widget_paycard)
+        val scheme = ColorManager.getScheme(context)
+        views.setInt(R.id.widget_name, "setBackgroundResource", scheme.widgetName)
+        views.setInt(R.id.widget_refresh, "setBackgroundResource", scheme.widgetRefresh)
         val account = AccountStore.get(context).current()
 
         if (account == null) {

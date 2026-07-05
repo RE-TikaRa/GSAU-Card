@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.tika.paycard.R
 import com.tika.paycard.databinding.ActivitySettingsBinding
+import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
 
 /**
@@ -95,6 +96,7 @@ class SettingsActivity : AppCompatActivity() {
             view.setOnClickListener {
                 if (scheme != ColorManager.getScheme(this)) {
                     ColorManager.setScheme(this, scheme)
+                    PayWidgetProvider.refreshAll(this)
                     recreate()
                 }
             }
