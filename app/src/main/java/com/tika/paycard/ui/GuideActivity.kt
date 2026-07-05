@@ -19,6 +19,7 @@ class GuideActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ColorManager.applyOverlay(this)
         binding = ActivityGuideBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

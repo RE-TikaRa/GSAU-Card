@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ColorManager.applyOverlay(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         store = AccountStore.get(this)

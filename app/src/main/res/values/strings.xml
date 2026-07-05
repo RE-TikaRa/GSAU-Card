@@ -57,6 +57,12 @@
     <string name="settings_theme_system">跟随系统</string>
     <string name="settings_theme_light">浅色模式</string>
     <string name="settings_theme_dark">深色模式</string>
+    <string name="settings_color_title">主题配色</string>
+    <string name="settings_color_gray_green">灰绿</string>
+    <string name="settings_color_gray_blue">灰蓝</string>
+    <string name="settings_color_lotus_pink">藕粉</string>
+    <string name="settings_color_terracotta">陶土</string>
+    <string name="settings_color_gray_mauve">灰紫</string>
     <string name="settings_keepalive_title">后台保活</string>
     <string name="settings_keepalive_desc">不管选哪档，点开付款页永远实时拉最新码。</string>
     <string name="settings_mode_lite">省心档：后台定时刷新，无常驻通知</string>

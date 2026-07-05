@@ -24,6 +24,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ColorManager.applyOverlay(this)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -43,6 +44,8 @@ class SettingsActivity : AppCompatActivity() {
             }
             if (mode != ThemeManager.getMode(this)) ThemeManager.setMode(this, mode)
         }
+
+        setupColorSwatches()
 
         when (KeepAlive.getMode(this)) {
             KeepAlive.Mode.LITE -> binding.radioLite.isChecked = true
@@ -74,6 +77,27 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.btnAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
+        }
+    }
+
+    private fun setupColorSwatches() {
+        val swatches = mapOf(
+            binding.swatchGrayGreen to ColorManager.Scheme.GRAY_GREEN,
+            binding.swatchGrayBlue to ColorManager.Scheme.GRAY_BLUE,
+            binding.swatchLotusPink to ColorManager.Scheme.LOTUS_PINK,
+            binding.swatchTerracotta to ColorManager.Scheme.TERRACOTTA,
+            binding.swatchGrayMauve to ColorManager.Scheme.GRAY_MAUVE
+        )
+        val current = ColorManager.getScheme(this)
+        swatches.forEach { (view, scheme) ->
+            view.foreground = if (scheme == current)
+                ContextCompat.getDrawable(this, R.drawable.swatch_ring_on) else null
+            view.setOnClickListener {
+                if (scheme != ColorManager.getScheme(this)) {
+                    ColorManager.setScheme(this, scheme)
+                    recreate()
+                }
+            }
         }
     }
 
