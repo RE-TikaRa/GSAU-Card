@@ -17,8 +17,6 @@
 - 省心档（LITE）：仅 WorkManager。
 - 稳妥档（STEADY）：WorkManager + 前台服务（60 秒密集刷新）。
 
-`RefreshWorker.cancel()` 保留作为对称 API，供未来「完全停用后台刷新」开关使用，目前无调用点。
-
 **理由**:即使省心档，也需要一个不依赖前台服务的兜底刷新，否则组件长时间不更新会导致付款码过期。
 
 **待验证**:稳妥档用 `dataSync` 前台服务类型。Android 14 起 `dataSync` 有单日累计约 6 小时运行上限，长驻场景可能被系统回收。真机观察是否触顶；若触顶，再评估 `specialUse` 类型（需在应用商店说明用途）或退回纯 WorkManager 兜底。
