@@ -39,7 +39,7 @@
 </td>
 <td width="45%" valign="top" align="center">
 
-<img src="docs/widget-mockup.png" width="220" alt="桌面组件示意" />
+<img src="docs/widget-mockup.jpg" width="220" alt="桌面组件示意" />
 
 </td>
 </tr>
