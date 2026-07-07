@@ -6,9 +6,14 @@ import android.text.InputType
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.tika.paycard.R
 import com.tika.paycard.databinding.DialogAppBinding
+import com.tika.paycard.databinding.DialogMenuBinding
 
 /**
  * 应用内统一弹窗:输入、确认、警告共用一套外观与动效,替代系统原生 AlertDialog。
@@ -42,7 +47,8 @@ object AppDialog {
         hint: CharSequence,
         positiveText: CharSequence,
         onPositive: (String) -> Unit,
-        negativeText: CharSequence = context.getString(R.string.cancel)
+        negativeText: CharSequence = context.getString(R.string.cancel),
+        initial: CharSequence = ""
     ) {
         build(context) { binding, dismiss ->
             binding.dialogTitle.text = title
@@ -50,6 +56,10 @@ object AppDialog {
             binding.dialogInput.visibility = android.view.View.VISIBLE
             binding.dialogInput.hint = hint
             binding.dialogInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            if (initial.isNotEmpty()) {
+                binding.dialogInput.setText(initial)
+                binding.dialogInput.setSelection(initial.length)
+            }
             binding.dialogPositive.text = positiveText
             binding.dialogNegative.text = negativeText
             binding.dialogPositive.setOnClickListener {
@@ -77,6 +87,40 @@ object AppDialog {
             binding.dialogPositive.text = closeText
             binding.dialogPositive.setOnClickListener { dismiss() }
         }
+    }
+
+    /** 操作菜单:标题 + 若干可点项,点任一项执行对应动作并关闭。列表项长按弹此菜单。 */
+    fun menu(
+        context: Context,
+        title: CharSequence,
+        items: List<Pair<CharSequence, () -> Unit>>
+    ) {
+        val binding = DialogMenuBinding.inflate(LayoutInflater.from(context))
+        val dialog = Dialog(context, R.style.Dialog_PayCard).apply {
+            setContentView(binding.root)
+            window?.setLayout(
+                (context.resources.displayMetrics.widthPixels * 0.72f).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        binding.menuTitle.text = title
+        val pad = (context.resources.displayMetrics.density * 14).toInt()
+        items.forEach { (label, action) ->
+            val item = TextView(context).apply {
+                text = label
+                textSize = 16f
+                setTextColor(ContextCompat.getColor(context, R.color.text_dark))
+                setBackgroundResource(R.drawable.bg_item_ripple)
+                setPadding(pad, pad, pad, pad)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = pad / 3 }
+                setOnClickListener { dialog.dismiss(); action() }
+            }
+            binding.menuItems.addView(item)
+        }
+        dialog.show()
     }
 
     /** 轻提示:操作结果、校验失败等短反馈,跟随 App 主题,替代系统 Toast。 */

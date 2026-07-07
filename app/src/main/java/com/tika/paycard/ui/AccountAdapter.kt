@@ -8,7 +8,7 @@ import com.tika.paycard.data.Account
 import com.tika.paycard.databinding.ItemAccountBinding
 
 /**
- * 账号列表:点击切换当前卡,长按删除。当前选中项高亮。
+ * 账号列表:点击切换当前卡,长按弹改名/删除菜单。当前选中项高亮。
  */
 class AccountAdapter(
     private val onClick: (Int) -> Unit,

@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         adapter = AccountAdapter(
             onClick = { index -> selectAccount(index) },
-            onLongClick = { index -> confirmRemove(index) }
+            onLongClick = { index -> showItemMenu(index) }
         )
         binding.accountList.layoutManager = LinearLayoutManager(this)
         binding.accountList.adapter = adapter
@@ -236,6 +236,37 @@ class MainActivity : AppCompatActivity() {
                     AppDialog.notice(binding.root, getString(R.string.add_verify_failed, r.message))
             }
         }
+    }
+
+    /** 列表项长按:弹改名/删除菜单。 */
+    private fun showItemMenu(index: Int) {
+        val account = store.list().getOrNull(index) ?: return
+        AppDialog.menu(
+            context = this,
+            title = getString(R.string.item_menu_title, account.displayName()),
+            items = listOf(
+                getString(R.string.item_menu_rename) to { showRenameDialog(index) },
+                getString(R.string.item_menu_remove) to { confirmRemove(index) }
+            )
+        )
+    }
+
+    private fun showRenameDialog(index: Int) {
+        val account = store.list().getOrNull(index) ?: return
+        AppDialog.input(
+            context = this,
+            title = getString(R.string.rename_dialog_title),
+            message = getString(R.string.rename_dialog_message),
+            hint = getString(R.string.rename_dialog_hint),
+            positiveText = getString(R.string.rename_action),
+            onPositive = { input ->
+                store.update(account.copy(alias = input.trim()))
+                renderCurrent()
+                adapter.submit(store.list(), store.currentIndex())
+                PayWidgetProvider.refreshAll(this)
+            },
+            initial = account.alias
+        )
     }
 
     private fun confirmRemove(index: Int) {

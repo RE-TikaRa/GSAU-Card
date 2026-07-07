@@ -11,7 +11,7 @@
     <string name="main_add_hint">点右上角 + 粘贴付款码链接添加</string>
     <string name="main_loading">正在获取付款码…</string>
     <string name="main_tap_qr">点二维码进入全屏付款</string>
-    <string name="main_card_list_title">我的卡片（点击切换，长按删除）</string>
+    <string name="main_card_list_title">我的卡片（点击切换，长按改名/删除）</string>
     <string name="main_invalid">凭证失效，点这里重新绑定</string>
     <string name="rebind_dialog_title">重新绑定 %1$s</string>
     <string name="rebind_dialog_message">凭证已失效。重新从企业微信复制付款码链接粘贴到这里，替换当前这张卡。</string>
@@ -35,6 +35,17 @@
     <string name="add_invalid">链接有效但取不到付款码，可能已失效</string>
     <string name="add_verify_failed">验证失败：%1$s</string>
     <string name="add_success">已添加 %1$s</string>
+
+    <!-- 列表项操作菜单 -->
+    <string name="item_menu_title">%1$s</string>
+    <string name="item_menu_rename">改名</string>
+    <string name="item_menu_remove">删除</string>
+
+    <!-- 改名对话框 -->
+    <string name="rename_dialog_title">给这张卡起个名字</string>
+    <string name="rename_dialog_message">备注只显示在本机,方便区分多张卡。留空则用原始姓名。</string>
+    <string name="rename_dialog_hint">输入备注名</string>
+    <string name="rename_action">保存</string>
 
     <!-- 删除对话框 -->
     <string name="remove_dialog_title">删除</string>

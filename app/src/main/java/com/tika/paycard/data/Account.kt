@@ -13,7 +13,8 @@ data class Account(
     var cardNo: String = "",
     var balance: String = "",
     var cachedCode: String = "",
-    var cachedAt: Long = 0L
+    var cachedAt: Long = 0L,
+    var alias: String = ""
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("openid", openid)
@@ -23,10 +24,12 @@ data class Account(
         put("balance", balance)
         put("cachedCode", cachedCode)
         put("cachedAt", cachedAt)
+        put("alias", alias)
     }
 
-    /** 展示用标题:优先姓名,没有则用卡号,再没有用 openid 尾段 */
+    /** 展示用标题:优先用户备注,再姓名,再卡号,最后 openid 尾段 */
     fun displayName(): String = when {
+        alias.isNotBlank() -> alias
         name.isNotBlank() -> name
         cardNo.isNotBlank() -> cardNo
         else -> "卡" + openid.takeLast(4)
@@ -40,7 +43,8 @@ data class Account(
             cardNo = o.optString("cardNo", ""),
             balance = o.optString("balance", ""),
             cachedCode = o.optString("cachedCode", ""),
-            cachedAt = o.optLong("cachedAt", 0L)
+            cachedAt = o.optLong("cachedAt", 0L),
+            alias = o.optString("alias", "")
         )
     }
 }
