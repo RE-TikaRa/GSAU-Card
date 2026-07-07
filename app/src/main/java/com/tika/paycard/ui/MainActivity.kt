@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.color.MaterialColors
 import com.tika.paycard.R
 import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
@@ -84,6 +86,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderCurrent() {
+        clearHintAction()
         val account = store.current()
         if (account == null) {
             binding.cardName.text = getString(R.string.main_no_card)
@@ -112,6 +115,7 @@ class MainActivity : AppCompatActivity() {
             if (store.current()?.openid != account.openid) return@launch
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
+                    clearHintAction()
                     binding.cardName.text = account.displayName()
                     showBalance(r.balance)
                     binding.cardQr.setImageBitmap(
@@ -121,10 +125,69 @@ class MainActivity : AppCompatActivity() {
                     adapter.submit(store.list(), store.currentIndex())
                     PayWidgetProvider.refreshAll(this@MainActivity)
                 }
-                is PayCodeRepository.Result.Invalid ->
-                    binding.cardHint.text = getString(R.string.main_invalid)
+                is PayCodeRepository.Result.Invalid -> showInvalidHint(account)
                 is PayCodeRepository.Result.Error ->
                     binding.cardHint.text = getString(R.string.main_fetch_failed, r.message)
+            }
+        }
+    }
+
+    /** 清掉提示的可点态,恢复成普通说明文字。 */
+    private fun clearHintAction() {
+        binding.cardHint.setOnClickListener(null)
+        binding.cardHint.isClickable = false
+        binding.cardHint.setTextColor(
+            ContextCompat.getColor(this, R.color.text_hint)
+        )
+    }
+
+    /** 凭证失效:提示改成可点,点击进入重新绑定。 */
+    private fun showInvalidHint(account: Account) {
+        binding.cardHint.text = getString(R.string.main_invalid)
+        binding.cardHint.setTextColor(
+            MaterialColors.getColor(binding.cardHint, com.google.android.material.R.attr.colorPrimary)
+        )
+        binding.cardHint.isClickable = true
+        binding.cardHint.setOnClickListener { showRebindDialog(account) }
+    }
+
+    /** 用新链接就地替换当前失效卡,openid 换新,cardId 沿用原卡。 */
+    private fun showRebindDialog(invalid: Account) {
+        val index = store.list().indexOfFirst {
+            it.openid == invalid.openid && it.cardId == invalid.cardId
+        }
+        if (index < 0) return
+        AppDialog.input(
+            context = this,
+            title = getString(R.string.rebind_dialog_title, invalid.displayName()),
+            message = getString(R.string.rebind_dialog_message),
+            hint = getString(R.string.add_dialog_hint),
+            positiveText = getString(R.string.rebind_action),
+            onPositive = { link -> rebind(index, link) }
+        )
+    }
+
+    private fun rebind(index: Int, link: String) {
+        val parsed = LinkParser.parse(link)
+        if (parsed == null) {
+            AppDialog.notice(binding.root, getString(R.string.add_no_openid))
+            return
+        }
+        val account = Account(openid = parsed.openid, cardId = parsed.cardId)
+        lifecycleScope.launch {
+            when (val r = PayCodeManager.refresh(this@MainActivity, account)) {
+                is PayCodeRepository.Result.Ok -> {
+                    store.replaceAt(index, account)
+                    store.setCurrentIndex(index)
+                    renderCurrent()
+                    adapter.submit(store.list(), store.currentIndex())
+                    PayWidgetProvider.refreshAll(this@MainActivity)
+                    AppDialog.notice(binding.root, getString(R.string.rebind_success, account.displayName()))
+                }
+                is PayCodeRepository.Result.Invalid ->
+                    AppDialog.notice(binding.root, getString(R.string.rebind_still_invalid))
+                is PayCodeRepository.Result.Error ->
+                    AppDialog.notice(binding.root, getString(R.string.add_verify_failed, r.message))
             }
         }
     }

@@ -12,7 +12,12 @@
     <string name="main_loading">正在获取付款码…</string>
     <string name="main_tap_qr">点二维码进入全屏付款</string>
     <string name="main_card_list_title">我的卡片（点击切换，长按删除）</string>
-    <string name="main_invalid">凭证失效，请重新添加此卡</string>
+    <string name="main_invalid">凭证失效，点这里重新绑定</string>
+    <string name="rebind_dialog_title">重新绑定 %1$s</string>
+    <string name="rebind_dialog_message">凭证已失效。重新从企业微信复制付款码链接粘贴到这里，替换当前这张卡。</string>
+    <string name="rebind_action">重新绑定</string>
+    <string name="rebind_success">已重新绑定 %1$s</string>
+    <string name="rebind_still_invalid">链接仍然取不到付款码，请确认是最新的链接</string>
     <string name="main_fetch_failed">获取失败：%1$s</string>
     <string name="cd_add">添加</string>
     <string name="cd_settings">设置</string>

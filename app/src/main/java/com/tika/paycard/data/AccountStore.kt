@@ -64,6 +64,14 @@ class AccountStore private constructor(private val ctx: Context) {
         if (cur >= all.size) setCurrentIndex((all.size - 1).coerceAtLeast(0))
     }
 
+    /** 就地替换某张卡,保持它在列表中的位置。凭证失效后重新绑定用。 */
+    fun replaceAt(i: Int, account: Account) {
+        val all = list()
+        if (i !in all.indices) return
+        all[i] = account
+        save(all)
+    }
+
     /** 回填抓取结果并持久化 */
     fun update(account: Account) {
         val all = list()
