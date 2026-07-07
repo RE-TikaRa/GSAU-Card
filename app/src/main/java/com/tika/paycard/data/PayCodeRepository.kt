@@ -2,9 +2,7 @@ package com.tika.paycard.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.concurrent.TimeUnit
 
 /**
  * 抓取付款码页面并解析出付款码内容与账户信息。
@@ -19,10 +17,7 @@ class PayCodeRepository {
         data class Error(val message: String) : Result()
     }
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private val client = Http.client
 
     suspend fun fetch(openid: String, cardId: String): Result = withContext(Dispatchers.IO) {
         val url = "$BASE?openid=$openid&displayflag=1&id=$cardId"

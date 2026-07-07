@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.util.LruCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
 
@@ -15,8 +14,8 @@ import java.util.concurrent.TimeUnit
  */
 object ImageLoader {
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
+    // 图片较大,读超时放宽到 15s,连接池与线程池仍复用共享 client
+    private val client = Http.client.newBuilder()
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
 

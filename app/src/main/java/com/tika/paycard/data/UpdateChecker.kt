@@ -2,9 +2,7 @@ package com.tika.paycard.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.util.concurrent.TimeUnit
 
 /**
  * 读 GitHub Releases 最新版,与当前 versionName 比对。
@@ -19,10 +17,7 @@ object UpdateChecker {
         data class Error(val message: String) : Result()
     }
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private val client = Http.client
 
     suspend fun check(currentVersion: String): Result = withContext(Dispatchers.IO) {
         val req = Request.Builder()
