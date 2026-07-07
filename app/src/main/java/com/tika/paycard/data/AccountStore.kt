@@ -60,8 +60,14 @@ class AccountStore private constructor(private val ctx: Context) {
         if (i !in all.indices) return
         all.removeAt(i)
         save(all)
+        // 删掉当前卡之前的卡时,列表整体前移,选中索引要跟着前移才不会跳到别的卡
         val cur = prefs.getInt(KEY_CURRENT, 0)
-        if (cur >= all.size) setCurrentIndex((all.size - 1).coerceAtLeast(0))
+        val next = when {
+            all.isEmpty() -> 0
+            i < cur -> cur - 1
+            else -> cur.coerceAtMost(all.size - 1)
+        }
+        setCurrentIndex(next)
     }
 
     /** 就地替换某张卡,保持它在列表中的位置。凭证失效后重新绑定用。 */
