@@ -26,10 +26,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var store: AccountStore
     private lateinit var adapter: AccountAdapter
+    private lateinit var appliedScheme: ColorManager.Scheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ColorManager.applyOverlay(this)
+        appliedScheme = ColorManager.getScheme(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         store = AccountStore.get(this)
@@ -64,6 +66,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (ColorManager.getScheme(this) != appliedScheme) {
+            recreate()
+            return
+        }
         renderCurrent()
         adapter.submit(store.list(), store.currentIndex())
     }
