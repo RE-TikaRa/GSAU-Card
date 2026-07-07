@@ -93,8 +93,12 @@ class PayActivity : AppCompatActivity() {
         binding.payHint.text = getString(R.string.pay_refreshing)
         lifecycleScope.launch {
             val r = PayCodeManager.refresh(this@PayActivity, account)
-            // 刷新期间当前账号可能已被切换,只更新仍是当前账号的结果,避免展示错卡
-            if (AccountStore.get(this@PayActivity).current()?.openid != account.openid) return@launch
+            // 刷新期间当前账号可能已被切换,丢弃本次结果并回到当前账号的稳定展示,不把提示卡在"刷新中"
+            if (AccountStore.get(this@PayActivity).current()?.openid != account.openid) {
+                showCached()
+                binding.payHint.text = getString(R.string.pay_auto_refresh)
+                return@launch
+            }
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
                     binding.payQr.setImageBitmap(

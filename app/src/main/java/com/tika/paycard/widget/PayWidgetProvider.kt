@@ -33,17 +33,21 @@ class PayWidgetProvider : AppWidgetProvider() {
             ACTION_SWITCH -> {
                 AccountStore.get(context).switchToNext()
                 refreshAll(context)
+                fetchAndRefresh(context)
             }
-            ACTION_REFRESH -> {
-                val pending = goAsync()
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        PayCodeManager.refreshCurrent(context)
-                        refreshAll(context)
-                    } finally {
-                        pending.finish()
-                    }
-                }
+            ACTION_REFRESH -> fetchAndRefresh(context)
+        }
+    }
+
+    /** 拉当前账号最新码再刷组件。切号与点刷新共用。 */
+    private fun fetchAndRefresh(context: Context) {
+        val pending = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                PayCodeManager.refreshCurrent(context)
+                refreshAll(context)
+            } finally {
+                pending.finish()
             }
         }
     }
