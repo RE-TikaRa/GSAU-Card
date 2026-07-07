@@ -93,8 +93,9 @@ class PayActivity : AppCompatActivity() {
         binding.payHint.text = getString(R.string.pay_refreshing)
         lifecycleScope.launch {
             val r = PayCodeManager.refresh(this@PayActivity, account)
-            // 刷新期间当前账号可能已被切换,丢弃本次结果并回到当前账号的稳定展示,不把提示卡在"刷新中"
-            if (AccountStore.get(this@PayActivity).current()?.openid != account.openid) {
+            // 刷新期间当前账号可能已被切换,丢弃本次结果并回到当前账号的稳定展示,不把提示卡在"刷新中"。按 openid+cardId 复合键判定,同 openid 多卡才不会错配
+            val cur = AccountStore.get(this@PayActivity).current()
+            if (cur?.openid != account.openid || cur.cardId != account.cardId) {
                 showCached()
                 binding.payHint.text = getString(R.string.pay_auto_refresh)
                 return@launch
