@@ -10,15 +10,16 @@
         <item name="colorOnSurfaceVariant">@color/text_hint</item>
         <item name="colorOutline">@color/outline</item>
         <item name="colorNameBar">@color/name_bar</item>
-        <item name="android:windowBackground">@color/screen_bg</item>
-        <item name="android:colorBackground">@color/screen_bg</item>
+        <item name="colorScreenBg">@color/screen_bg</item>
+        <item name="android:windowBackground">?attr/colorScreenBg</item>
+        <item name="android:colorBackground">?attr/colorScreenBg</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.PayCard.Dialog</item>
         <item name="android:windowAnimationStyle">@style/Animation.PayCard.Activity</item>
     </style>
 
-    <!-- 付款页跟随主题：浅色白底、深色深底 -->
+    <!-- 付款页跟随配色页面底，与主页统一 -->
     <style name="Theme.PayCard.Pay" parent="Theme.PayCard">
-        <item name="android:windowBackground">@color/surface</item>
+        <item name="android:windowBackground">?attr/colorScreenBg</item>
     </style>
 
     <!-- 统一弹窗外观：圆角、主题色按钮 -->
@@ -55,6 +56,7 @@
         <item name="colorPrimaryDark">@color/gg_dark</item>
         <item name="colorSecondary">@color/gg_accent</item>
         <item name="colorNameBar">@color/gg_bar</item>
+        <item name="colorScreenBg">@color/gg_bg</item>
     </style>
 
     <style name="ThemeOverlay.PayCard.GrayBlue" parent="">
@@ -62,6 +64,7 @@
         <item name="colorPrimaryDark">@color/gb_dark</item>
         <item name="colorSecondary">@color/gb_accent</item>
         <item name="colorNameBar">@color/gb_bar</item>
+        <item name="colorScreenBg">@color/gb_bg</item>
     </style>
 
     <style name="ThemeOverlay.PayCard.LotusPink" parent="">
@@ -69,6 +72,7 @@
         <item name="colorPrimaryDark">@color/lp_dark</item>
         <item name="colorSecondary">@color/lp_accent</item>
         <item name="colorNameBar">@color/lp_bar</item>
+        <item name="colorScreenBg">@color/lp_bg</item>
     </style>
 
     <style name="ThemeOverlay.PayCard.Terracotta" parent="">
@@ -76,6 +80,7 @@
         <item name="colorPrimaryDark">@color/tc_dark</item>
         <item name="colorSecondary">@color/tc_accent</item>
         <item name="colorNameBar">@color/tc_bar</item>
+        <item name="colorScreenBg">@color/tc_bg</item>
     </style>
 
     <style name="ThemeOverlay.PayCard.GrayMauve" parent="">
@@ -83,5 +88,6 @@
         <item name="colorPrimaryDark">@color/gm_dark</item>
         <item name="colorSecondary">@color/gm_accent</item>
         <item name="colorNameBar">@color/gm_bar</item>
+        <item name="colorScreenBg">@color/gm_bg</item>
     </style>
 </resources>

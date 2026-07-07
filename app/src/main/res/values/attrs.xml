@@ -2,4 +2,6 @@
 <resources>
     <!-- 姓名条底色，随配色主题切换 -->
     <attr name="colorNameBar" format="color" />
+    <!-- 页面背景色，随配色主题切换 -->
+    <attr name="colorScreenBg" format="color" />
 </resources>

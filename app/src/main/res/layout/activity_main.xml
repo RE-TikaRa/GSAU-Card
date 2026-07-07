@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/screen_bg"
+    android:background="?attr/colorScreenBg"
     android:padding="16dp">
 
     <!-- 顶栏:标题 + 添加 + 设置 -->
