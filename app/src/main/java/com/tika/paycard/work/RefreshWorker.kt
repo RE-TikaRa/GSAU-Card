@@ -1,8 +1,10 @@
 package com.tika.paycard.work
 
 import android.content.Context
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -31,7 +33,11 @@ class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         private const val WORK_NAME = "paycode_refresh"
 
         fun schedule(context: Context) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
             val req = PeriodicWorkRequestBuilder<RefreshWorker>(15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
                 .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
