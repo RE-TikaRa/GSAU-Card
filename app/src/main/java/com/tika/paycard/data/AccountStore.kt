@@ -10,6 +10,7 @@ import org.json.JSONArray
 class AccountStore private constructor(private val ctx: Context) {
 
     private val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val lock = Any()
 
     fun list(): MutableList<Account> {
         val raw = prefs.getString(KEY_ACCOUNTS, null) ?: return mutableListOf()
@@ -23,11 +24,7 @@ class AccountStore private constructor(private val ctx: Context) {
         prefs.edit().putString(KEY_ACCOUNTS, arr.toString()).apply()
     }
 
-    fun currentIndex(): Int {
-        val size = list().size
-        if (size == 0) return -1
-        return prefs.getInt(KEY_CURRENT, 0).coerceIn(0, size - 1)
-    }
+    fun currentIndex(): Int = clampIndex(prefs.getInt(KEY_CURRENT, 0), list().size)
 
     fun setCurrentIndex(i: Int) {
         prefs.edit().putInt(KEY_CURRENT, i).apply()
@@ -40,46 +37,39 @@ class AccountStore private constructor(private val ctx: Context) {
     }
 
     /** 切到下一个账号,返回切换后的账号。组件点姓名条时用。 */
-    fun switchToNext(): Account? {
+    fun switchToNext(): Account? = synchronized(lock) {
         val all = list()
-        if (all.isEmpty()) return null
-        val next = (currentIndex() + 1) % all.size
+        if (all.isEmpty()) return@synchronized null
+        val next = nextIndex(currentIndex(), all.size)
         setCurrentIndex(next)
-        return all[next]
+        all[next]
     }
 
-    fun add(account: Account) {
+    fun add(account: Account) = synchronized(lock) {
         val all = list()
         val existing = all.indexOfFirst { it.openid == account.openid && it.cardId == account.cardId }
         if (existing >= 0) all[existing] = account else all.add(account)
         save(all)
     }
 
-    fun removeAt(i: Int) {
+    fun removeAt(i: Int) = synchronized(lock) {
         val all = list()
-        if (i !in all.indices) return
+        if (i !in all.indices) return@synchronized
         all.removeAt(i)
         save(all)
-        // 删掉当前卡之前的卡时,列表整体前移,选中索引要跟着前移才不会跳到别的卡
-        val cur = prefs.getInt(KEY_CURRENT, 0)
-        val next = when {
-            all.isEmpty() -> 0
-            i < cur -> cur - 1
-            else -> cur.coerceAtMost(all.size - 1)
-        }
-        setCurrentIndex(next)
+        setCurrentIndex(indexAfterRemoval(prefs.getInt(KEY_CURRENT, 0), i, all.size))
     }
 
     /** 就地替换某张卡,保持它在列表中的位置。凭证失效后重新绑定用。 */
-    fun replaceAt(i: Int, account: Account) {
+    fun replaceAt(i: Int, account: Account) = synchronized(lock) {
         val all = list()
-        if (i !in all.indices) return
+        if (i !in all.indices) return@synchronized
         all[i] = account
         save(all)
     }
 
     /** 回填抓取结果并持久化 */
-    fun update(account: Account) {
+    fun update(account: Account) = synchronized(lock) {
         val all = list()
         val i = all.indexOfFirst { it.openid == account.openid && it.cardId == account.cardId }
         if (i >= 0) {
@@ -92,6 +82,21 @@ class AccountStore private constructor(private val ctx: Context) {
         private const val PREFS = "paycard_store"
         private const val KEY_ACCOUNTS = "accounts"
         private const val KEY_CURRENT = "current_index"
+
+        /** 把存储的选中索引夹到合法范围;空列表返回 -1。 */
+        fun clampIndex(stored: Int, size: Int): Int =
+            if (size == 0) -1 else stored.coerceIn(0, size - 1)
+
+        /** 环形切到下一个;空列表返回 -1。 */
+        fun nextIndex(current: Int, size: Int): Int =
+            if (size == 0) -1 else (current + 1) % size
+
+        /** 删掉 removed 位后重算选中索引:删当前之前的卡列表前移,索引跟着前移。 */
+        fun indexAfterRemoval(current: Int, removed: Int, sizeAfter: Int): Int = when {
+            sizeAfter == 0 -> 0
+            removed < current -> current - 1
+            else -> current.coerceAtMost(sizeAfter - 1)
+        }
 
         @Volatile
         private var instance: AccountStore? = null
