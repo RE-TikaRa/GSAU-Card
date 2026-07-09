@@ -18,8 +18,6 @@
     <color name="text_light">#FFFFFF</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="scrim">#66000000</color>
-
     <!-- 莫兰迪五套配色（浅色）：灰绿 / 灰蓝 / 藕粉 / 陶土 / 灰紫 -->
     <color name="gg_primary">#6B8E7F</color>
     <color name="gg_dark">#4F6B5F</color>
