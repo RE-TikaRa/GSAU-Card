@@ -14,9 +14,10 @@ import java.util.concurrent.TimeUnit
  */
 object ImageLoader {
 
-    // 图片较大,读超时放宽到 15s,连接池与线程池仍复用共享 client
+    // 图片较大,读超时放宽到 15s 并解除共享 client 的 callTimeout 总上限,连接池与线程池仍复用
     private val client = Http.client.newBuilder()
         .readTimeout(15, TimeUnit.SECONDS)
+        .callTimeout(0, TimeUnit.SECONDS)
         .build()
 
     private val cache = object : LruCache<String, Bitmap>(8 * 1024 * 1024) {
