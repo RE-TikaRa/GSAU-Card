@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.RemoteViews
 import com.tika.paycard.R
 import com.tika.paycard.ui.ColorManager
@@ -85,7 +86,9 @@ class PayWidgetProvider : AppWidgetProvider() {
             // 点刷新按钮就地拉最新码
             views.setOnClickPendingIntent(R.id.widget_refresh, refreshIntent(context))
         }
-        manager.updateAppWidget(widgetId, views)
+        // RemoteViews 经 Binder 传桌面进程,事务超限等异常会让这次更新无声丢失,记下来便于定位
+        runCatching { manager.updateAppWidget(widgetId, views) }
+            .onFailure { Log.w(TAG, "updateAppWidget 失败,组件本轮未刷新", it) }
     }
 
     private fun openAppIntent(context: Context): PendingIntent {
@@ -114,6 +117,7 @@ class PayWidgetProvider : AppWidgetProvider() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
     companion object {
+        private const val TAG = "PayWidget"
         private const val ACTION_SWITCH = "com.tika.paycard.WIDGET_SWITCH"
         private const val ACTION_REFRESH = "com.tika.paycard.WIDGET_REFRESH"
 
