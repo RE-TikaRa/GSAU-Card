@@ -50,11 +50,6 @@ class RefreshService : Service() {
         return START_STICKY
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        start(applicationContext)
-        super.onTaskRemoved(rootIntent)
-    }
-
     override fun onDestroy() {
         scope.cancel()
         super.onDestroy()
