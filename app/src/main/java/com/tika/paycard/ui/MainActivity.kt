@@ -153,9 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     /** 用新链接就地替换当前失效卡,openid 换新,cardId 沿用原卡。 */
     private fun showRebindDialog(invalid: Account) {
-        val index = store.list().indexOfFirst {
-            it.openid == invalid.openid && it.cardId == invalid.cardId
-        }
+        val index = store.list().indexOfFirst { it.sameCard(invalid) }
         if (index < 0) return
         AppDialog.input(
             context = this,
@@ -221,9 +219,7 @@ class MainActivity : AppCompatActivity() {
             when (val r = PayCodeManager.refresh(this@MainActivity, account)) {
                 is PayCodeRepository.Result.Ok -> {
                     store.add(account)
-                    val newIndex = store.list().indexOfFirst {
-                        it.openid == account.openid && it.cardId == account.cardId
-                    }
+                    val newIndex = store.list().indexOfFirst { it.sameCard(account) }
                     if (newIndex >= 0) store.setCurrentIndex(newIndex)
                     renderCurrent()
                     adapter.submit(store.list(), store.currentIndex())

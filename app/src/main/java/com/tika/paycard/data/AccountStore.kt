@@ -47,7 +47,7 @@ class AccountStore private constructor(private val ctx: Context) {
 
     fun add(account: Account) = synchronized(lock) {
         val all = list()
-        val existing = all.indexOfFirst { it.openid == account.openid && it.cardId == account.cardId }
+        val existing = all.indexOfFirst { it.sameCard(account) }
         if (existing >= 0) all[existing] = account else all.add(account)
         save(all)
     }
@@ -71,7 +71,7 @@ class AccountStore private constructor(private val ctx: Context) {
     /** 回填抓取结果并持久化 */
     fun update(account: Account) = synchronized(lock) {
         val all = list()
-        val i = all.indexOfFirst { it.openid == account.openid && it.cardId == account.cardId }
+        val i = all.indexOfFirst { it.sameCard(account) }
         if (i >= 0) {
             all[i] = account
             save(all)
