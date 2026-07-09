@@ -86,7 +86,7 @@ com.tika.paycard
 │   ├── RefreshWorker      WorkManager 周期刷新（15 分钟兜底）
 │   ├── RefreshService     前台服务（60 秒密集刷新）
 │   ├── KeepAlive          保活档位 + 系统设置跳转
-│   └── BootReceiver       开机后按档位恢复保活
+│   └── BootReceiver       开机只调度 WorkManager 兜底（前台服务待打开 App 合法拉起）
 └── ui/            界面
     ├── MainActivity       主界面：当前卡 + 账号列表
     ├── PayActivity        全屏付款页
@@ -161,6 +161,7 @@ git push origin v1.4      # 3. 推 tag，触发 Actions 构建
 ## 已知限制
 
 - Android 桌面组件系统刷新周期最短 30 分钟，密集刷新依赖前台服务，可能被强省电策略影响。
+- 国产 ROM（OPPO / vivo / 荣耀等）后台管控较狠，前台服务被杀后组件上的码有几率是旧的。加电池白名单和自启动白名单能明显缓解，但治标不治本。真正付款时点开全屏页会强拉最新码，组件码偶尔旧了不影响使用。
 
 ## 许可证
 
