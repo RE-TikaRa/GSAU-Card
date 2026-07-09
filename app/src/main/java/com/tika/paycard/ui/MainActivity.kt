@@ -54,9 +54,6 @@ class MainActivity : AppCompatActivity() {
         binding.cardQr.setOnClickListener {
             startActivity(Intent(this, PayActivity::class.java))
         }
-
-        // 首次启动按当前档位拉起保活
-        KeepAlive.apply(this)
     }
 
     private fun maybeShowGuide() {
@@ -72,6 +69,8 @@ class MainActivity : AppCompatActivity() {
             recreate()
             return
         }
+        // 回到前台就按当前档位复位保活:有些 ROM 只杀前台服务不杀进程,只走 onResume 时借机重新拉起
+        KeepAlive.apply(this)
         renderCurrent()
         adapter.submit(store.list(), store.currentIndex())
     }
