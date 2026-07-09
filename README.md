@@ -130,7 +130,7 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 # 编译 debug apk
 ./gradlew assembleDebug
 
-# 跑解析层单元测试（付款码页面解析、链接解析）
+# 跑单元测试（付款码解析、链接解析、更新检查、账号索引与模型）
 ./gradlew testDebugUnitTest
 ```
 
