@@ -111,9 +111,8 @@ class MainActivity : AppCompatActivity() {
     private fun refreshCurrent(account: Account) {
         lifecycleScope.launch {
             val r = PayCodeManager.refresh(this@MainActivity, account)
-            // 刷新期间可能已切换账号,只更新仍是当前账号的结果。按 openid+cardId 复合键判定,同 openid 多卡才不会错配
-            val cur = store.current()
-            if (cur?.openid != account.openid || cur.cardId != account.cardId) return@launch
+            // 刷新期间可能已切换账号,只更新仍是当前账号的结果
+            if (!account.sameCard(store.current())) return@launch
             when (r) {
                 is PayCodeRepository.Result.Ok -> {
                     clearHintAction()

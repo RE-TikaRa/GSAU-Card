@@ -35,6 +35,10 @@ data class Account(
         else -> "卡" + openid.takeLast(4)
     }
 
+    /** 同一张卡的判定:openid + cardId 复合键。异步刷新回调据此确认当前卡未被切换。 */
+    fun sameCard(other: Account?): Boolean =
+        other != null && openid == other.openid && cardId == other.cardId
+
     companion object {
         fun fromJson(o: JSONObject) = Account(
             openid = o.getString("openid"),
