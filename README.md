@@ -160,7 +160,6 @@ git push origin v1.4      # 3. 推 tag，触发 Actions 构建
 
 ## 已知限制
 
-- `openid` 凭证有效期未知，失效后需重新粘贴链接重新绑定。详见 [PLAN_MISMATCHES.md](PLAN_MISMATCHES.md)。
 - Android 桌面组件系统刷新周期最短 30 分钟，密集刷新依赖前台服务，可能被强省电策略影响。
 
 ## 许可证
