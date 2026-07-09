@@ -100,7 +100,8 @@
                     android:id="@+id/swatchGrayGreen"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:contentDescription="@string/settings_color_gray_green">
                     <View
                         android:id="@+id/dotGrayGreen"
                         android:layout_width="36dp"
@@ -113,7 +114,8 @@
                     android:id="@+id/swatchGrayBlue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:contentDescription="@string/settings_color_gray_blue">
                     <View
                         android:id="@+id/dotGrayBlue"
                         android:layout_width="36dp"
@@ -126,7 +128,8 @@
                     android:id="@+id/swatchLotusPink"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:contentDescription="@string/settings_color_lotus_pink">
                     <View
                         android:id="@+id/dotLotusPink"
                         android:layout_width="36dp"
@@ -139,7 +142,8 @@
                     android:id="@+id/swatchTerracotta"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:contentDescription="@string/settings_color_terracotta">
                     <View
                         android:id="@+id/dotTerracotta"
                         android:layout_width="36dp"
@@ -152,7 +156,8 @@
                     android:id="@+id/swatchGrayMauve"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:contentDescription="@string/settings_color_gray_mauve">
                     <View
                         android:id="@+id/dotGrayMauve"
                         android:layout_width="36dp"
