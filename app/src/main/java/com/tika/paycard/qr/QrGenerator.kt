@@ -13,7 +13,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 object QrGenerator {
 
     /** 渲染像素尺寸档位:组件小、主界面中、全屏大。数值越大越清晰。 */
-    const val SIZE_WIDGET = 400
+    const val SIZE_WIDGET = 288
     const val SIZE_CARD = 600
     const val SIZE_FULLSCREEN = 700
 
