@@ -1,6 +1,7 @@
 package com.tika.paycard.data
 
 import android.content.Context
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -18,13 +19,13 @@ object PayCodeManager {
     )
 
     private val repo = PayCodeRepository()
-    private val refreshMutex = Mutex()
-    private val outcomes = mutableMapOf<CardKey, Outcome>()
+    private val refreshMutexes = ConcurrentHashMap<CardKey, Mutex>()
+    private val outcomes = ConcurrentHashMap<CardKey, Outcome>()
 
     suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
         val key = CardKey(account.openid, account.cardId)
         val invokedAt = System.nanoTime()
-        return refreshMutex.withLock {
+        return refreshMutexes.computeIfAbsent(key) { Mutex() }.withLock {
             outcomes[key]?.takeIf { it.completedAt >= invokedAt }?.let { outcome ->
                 outcome.account?.let { account.copyFrom(it) }
                 return@withLock outcome.result
