@@ -1,6 +1,6 @@
 /**
  * Cloudflare Worker:GitHub 反向代理,给 App 检查更新与下载提速。
- * 部署在 gh-proxy.lgq3218483753.workers.dev:
+ * 绑定自定义域名 gh.re-tikara.fun:
  *   /api/*  转发到 api.github.com(读 Releases 接口)
  *   /raw/*  转发到 raw.githubusercontent.com(引导页截图)
  *   其余     转发到 github.com(下载链接,自动跟随 302 到对象存储)
