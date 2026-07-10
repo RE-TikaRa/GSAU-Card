@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodeRepository
 import com.tika.paycard.widget.PayWidgetProvider
@@ -20,7 +21,12 @@ import java.util.concurrent.TimeUnit
 class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
-        val result = PayCodeManager.refreshCurrent(applicationContext)
+        val account = AccountStore.get(applicationContext).current()
+        if (account == null) {
+            PayWidgetProvider.refreshAll(applicationContext)
+            return Result.success()
+        }
+        val result = PayCodeManager.refresh(applicationContext, account)
         PayWidgetProvider.refreshAll(applicationContext)
         return when (result) {
             is PayCodeRepository.Result.Ok -> Result.success()
