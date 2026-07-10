@@ -14,6 +14,7 @@ import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.qr.QrGenerator
+import com.tika.paycard.work.RefreshWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,24 +25,36 @@ import kotlinx.coroutines.launch
  */
 class PayWidgetProvider : AppWidgetProvider() {
 
+    override fun onEnabled(context: Context) {
+        RefreshWorker.schedule(context)
+        fetchAndRender(context)
+    }
+
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { renderWidget(context, manager, it) }
+        fetchAndRender(context, manager, ids)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         when (intent.action) {
+            ACTION_RENDER -> renderAll(context, intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS))
             ACTION_SWITCH -> {
                 AccountStore.get(context).switchToNext()
-                refreshAll(context)
-                fetchAndRefresh(context)
+                renderAll(context)
+                fetchAndRender(context)
             }
-            ACTION_REFRESH -> fetchAndRefresh(context)
+            ACTION_REFRESH -> fetchAndRender(context)
         }
     }
 
     /** 拉当前账号最新码再刷组件。切号与点刷新共用。 */
-    private fun fetchAndRefresh(context: Context) {
+    private fun fetchAndRender(
+        context: Context,
+        manager: AppWidgetManager = AppWidgetManager.getInstance(context),
+        ids: IntArray = widgetIds(context, manager)
+    ) {
+        if (ids.isEmpty()) return
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -51,6 +64,11 @@ class PayWidgetProvider : AppWidgetProvider() {
                 pending.finish()
             }
         }
+    }
+
+    private fun renderAll(context: Context, ids: IntArray? = null) {
+        val manager = AppWidgetManager.getInstance(context)
+        (ids ?: widgetIds(context, manager)).forEach { renderWidget(context, manager, it) }
     }
 
     private fun renderWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
@@ -118,17 +136,22 @@ class PayWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "PayWidget"
+        private const val ACTION_RENDER = "com.tika.paycard.WIDGET_RENDER"
         private const val ACTION_SWITCH = "com.tika.paycard.WIDGET_SWITCH"
         private const val ACTION_REFRESH = "com.tika.paycard.WIDGET_REFRESH"
+
+        private fun widgetIds(context: Context, manager: AppWidgetManager): IntArray {
+            val cn = ComponentName(context, PayWidgetProvider::class.java)
+            return manager.getAppWidgetIds(cn)
+        }
 
         /** 刷新所有已放置的组件 */
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val cn = ComponentName(context, PayWidgetProvider::class.java)
-            val ids = manager.getAppWidgetIds(cn)
+            val ids = widgetIds(context, manager)
             if (ids.isNotEmpty()) {
                 val intent = Intent(context, PayWidgetProvider::class.java).apply {
-                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    action = ACTION_RENDER
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
                 }
                 context.sendBroadcast(intent)
