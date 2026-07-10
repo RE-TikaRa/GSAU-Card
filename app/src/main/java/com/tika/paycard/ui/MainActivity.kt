@@ -75,8 +75,7 @@ class MainActivity : AppCompatActivity() {
             recreate()
             return
         }
-        // 回到前台就按当前档位复位保活:有些 ROM 只杀前台服务不杀进程,只走 onResume 时借机重新拉起
-        KeepAlive.apply(this)
+        KeepAlive.enterForeground(this)
         renderCurrent()
         adapter.submit(store.list(), store.currentIndex())
         startLoop()
@@ -85,6 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         loopJob?.cancel()
         expiryJob?.cancel()
+        KeepAlive.leaveForeground(this)
         super.onPause()
     }
 

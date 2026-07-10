@@ -12,16 +12,20 @@
 
 **决策**:两档保活都保留 `RefreshWorker`（15 分钟周期，系统调度兜底）：
 
-- 省心档（LITE）：仅 WorkManager。
+- 省心档（LITE）：仅 WorkManager，组件不展示可能过期的付款码。
 - 稳妥档（STEADY）：WorkManager + 前台服务（30 秒密集刷新）。
 
-**理由**:即使省心档，也需要一个不依赖前台服务的兜底刷新，否则组件长时间不更新会导致付款码过期。
+**理由**:付款码只有约 1 分钟有效期，WorkManager 无法维持组件付款码的新鲜度。省心档把组件作为付款页入口，稳妥档才持续展示动态码。
 
-**开机恢复**:`BootReceiver` 只调度 `RefreshWorker`，不拉起前台服务。`dataSync` 类型不在 `BOOT_COMPLETED` 的前台服务启动豁免名单内（Android 14），从开机广播直接启动会抛 `ForegroundServiceStartNotAllowedException`。稳妥档的前台服务留待用户下次打开 App 时，由 `MainActivity` 的 `KeepAlive.apply` 在前台合法拉起。付款码只有约 1 分钟有效期，重启后未打开 App 的空窗期用户不会付款；真要付款时打开 App 即恢复服务、进全屏页即强刷，功能无损。
+**默认档位**:改为稳妥档，包括尚未写入档位的既有用户。桌面组件是本项目的主要入口，默认行为优先保证付款码在有效期内。
+
+**组件过期**:每次展示新码时安排精确闹钟，在 `cachedAt + 60 秒` 触发组件重绘。闹钟只负责隐藏过期码，不执行联网请求；稳妥档服务正常运行时，新码会持续替换上一条闹钟。
+
+**开机恢复**:`BootReceiver` 只调度 `RefreshWorker`，不拉起前台服务。Android 15 且 targetSdk 35 起，`dataSync` 类型不能从 `BOOT_COMPLETED` 启动。稳妥档服务由组件放置、组件操作或 Activity 退到后台时恢复；主界面和付款页使用自身的 30 秒刷新循环。
 
 **同理**:`RefreshService` 不再在 `onTaskRemoved` 里手动 `start` 自身（后台启动前台服务同样受限），改由 `START_STICKY` 让系统在资源允许时自行重建。
 
-**待验证**:稳妥档用 `dataSync` 前台服务类型。Android 14 起 `dataSync` 有单日累计约 6 小时运行上限，长驻场景可能被系统回收。真机观察是否触顶；若触顶，再评估 `specialUse` 类型（需在应用商店说明用途）或退回纯 WorkManager 兜底。
+**待验证**:Android 15 且 targetSdk 35 起，`dataSync` 前台服务单日累计约 6 小时。当前 targetSdk 34 尚不受此限制，后续升级时需要重新设计后台刷新方式。
 
 ## 3. 协程刷新的账号引用竞态
 

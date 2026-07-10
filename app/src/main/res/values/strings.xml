@@ -66,6 +66,7 @@
     <string name="widget_add_card">点击添加校园卡</string>
     <string name="widget_no_account">未添加账号</string>
     <string name="widget_tap_refresh">点击刷新付款码</string>
+    <string name="widget_lite_mode">点开付款页获取新码</string>
 
     <!-- 设置页 -->
     <string name="settings_title">设置</string>
@@ -80,8 +81,8 @@
     <string name="settings_color_terracotta">陶土</string>
     <string name="settings_color_gray_mauve">灰紫</string>
     <string name="settings_keepalive_title">后台保活</string>
-    <string name="settings_keepalive_desc">不管选哪档，点开付款页永远实时拉最新码。</string>
-    <string name="settings_mode_lite">省心档：后台定时刷新，无常驻通知</string>
+    <string name="settings_keepalive_desc">付款码一分钟有效，稳妥档会持续刷新桌面组件。</string>
+    <string name="settings_mode_lite">省心档：组件不常驻付款码，无常驻通知</string>
     <string name="settings_mode_steady">稳妥档：前台服务保活，每 30 秒刷新（通知栏有一条常驻低优先级通知）</string>
     <string name="settings_system_title">系统设置</string>
     <string name="settings_battery_on">已加入电池白名单</string>
@@ -90,7 +91,7 @@
     <string name="settings_autostart_button">打开自启动管理（小米/OPPO/vivo）</string>
     <string name="settings_rom_hint">国产 ROM 的省电策略较强，建议同时开启电池白名单和自启动，后台刷新才稳。</string>
     <string name="settings_mode_steady_tip">已开启前台服务保活（通知栏会有一条常驻通知）</string>
-    <string name="settings_mode_lite_tip">已切到省心档（无常驻通知）</string>
+    <string name="settings_mode_lite_tip">已切到省心档（组件不常驻付款码）</string>
 
     <!-- 保活前台服务通知 -->
     <string name="notif_channel_name">付款码保活</string>

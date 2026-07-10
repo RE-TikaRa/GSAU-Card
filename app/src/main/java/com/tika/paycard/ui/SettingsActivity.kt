@@ -62,6 +62,7 @@ class SettingsActivity : AppCompatActivity() {
                 else -> KeepAlive.Mode.LITE
             }
             KeepAlive.setMode(this, mode)
+            PayWidgetProvider.refreshAll(this)
             if (mode == KeepAlive.Mode.STEADY) ensureNotificationPermission()
             val tip = if (mode == KeepAlive.Mode.STEADY)
                 R.string.settings_mode_steady_tip

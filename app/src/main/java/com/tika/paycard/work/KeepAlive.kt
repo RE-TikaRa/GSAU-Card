@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
+import com.tika.paycard.data.AccountStore
 
 /**
  * 保活档位与系统设置跳转。
@@ -21,8 +22,8 @@ object KeepAlive {
 
     fun getMode(context: Context): Mode {
         val v = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_MODE, Mode.LITE.name)
-        return runCatching { Mode.valueOf(v!!) }.getOrDefault(Mode.LITE)
+            .getString(KEY_MODE, Mode.STEADY.name)
+        return runCatching { Mode.valueOf(v!!) }.getOrDefault(Mode.STEADY)
     }
 
     fun setMode(context: Context, mode: Mode) {
@@ -36,8 +37,24 @@ object KeepAlive {
         RefreshWorker.schedule(context)
         when (mode) {
             Mode.LITE -> RefreshService.stop(context)
-            Mode.STEADY -> RefreshService.start(context)
+            Mode.STEADY -> if (
+                AccountStore.get(context).current() == null ||
+                !WidgetExpiry.canSchedule(context)
+            ) {
+                RefreshService.stop(context)
+            } else {
+                RefreshService.start(context)
+            }
         }
+    }
+
+    fun enterForeground(context: Context) {
+        RefreshWorker.schedule(context)
+        RefreshService.stop(context)
+    }
+
+    fun leaveForeground(context: Context) {
+        apply(context)
     }
 
     /** 是否已在电池优化白名单 */

@@ -14,6 +14,7 @@ import com.tika.paycard.data.PayCodeRepository
 import com.tika.paycard.databinding.ActivityPayBinding
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
+import com.tika.paycard.work.KeepAlive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -55,6 +56,7 @@ class PayActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        KeepAlive.enterForeground(this)
         showCached()
         startLoop()
     }
@@ -62,6 +64,7 @@ class PayActivity : AppCompatActivity() {
     override fun onPause() {
         loopJob?.cancel()
         expiryJob?.cancel()
+        KeepAlive.leaveForeground(this)
         super.onPause()
     }
 
