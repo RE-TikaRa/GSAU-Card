@@ -104,18 +104,4 @@ class AccountTest {
         assertFalse(a.hasFreshCode(now = 1_000L))
     }
 
-    @Test
-    fun `组件只展示手动获取的当前付款码`() {
-        val a = Account(
-            openid = "abcd",
-            cardId = "9",
-            cachedCode = "code",
-            cachedAt = 1_000L,
-            widgetCachedAt = 1_000L
-        )
-        assertTrue(a.hasWidgetCode(now = 1_001L))
-
-        a.cachedAt = 2_000L
-        assertFalse(a.hasWidgetCode(now = 2_001L))
-    }
 }

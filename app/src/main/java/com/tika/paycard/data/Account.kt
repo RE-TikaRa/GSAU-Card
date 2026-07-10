@@ -14,7 +14,6 @@ data class Account(
     var balance: String = "",
     var cachedCode: String = "",
     var cachedAt: Long = 0L,
-    var widgetCachedAt: Long = 0L,
     var alias: String = ""
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
@@ -25,7 +24,6 @@ data class Account(
         put("balance", balance)
         put("cachedCode", cachedCode)
         put("cachedAt", cachedAt)
-        put("widgetCachedAt", widgetCachedAt)
         put("alias", alias)
     }
 
@@ -46,9 +44,6 @@ data class Account(
         return cachedCode.isNotBlank() && cachedAt > 0L && age in 0 until PayCodePolicy.VALIDITY_MS
     }
 
-    fun hasWidgetCode(now: Long = System.currentTimeMillis()): Boolean =
-        widgetCachedAt == cachedAt && hasFreshCode(now)
-
     companion object {
         fun fromJson(o: JSONObject) = Account(
             openid = o.getString("openid"),
@@ -58,7 +53,6 @@ data class Account(
             balance = o.optString("balance", ""),
             cachedCode = o.optString("cachedCode", ""),
             cachedAt = o.optLong("cachedAt", 0L),
-            widgetCachedAt = o.optLong("widgetCachedAt", 0L),
             alias = o.optString("alias", "")
         )
     }

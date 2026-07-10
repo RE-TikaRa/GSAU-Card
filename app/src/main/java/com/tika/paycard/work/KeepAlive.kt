@@ -37,10 +37,7 @@ object KeepAlive {
         RefreshWorker.schedule(context)
         when (mode) {
             Mode.LITE -> RefreshService.stop(context)
-            Mode.STEADY -> if (
-                AccountStore.get(context).current() == null ||
-                !WidgetExpiry.canSchedule(context)
-            ) {
+            Mode.STEADY -> if (AccountStore.get(context).current() == null) {
                 RefreshService.stop(context)
             } else {
                 RefreshService.start(context)

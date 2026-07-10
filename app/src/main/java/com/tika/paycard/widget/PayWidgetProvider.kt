@@ -14,7 +14,6 @@ import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodePolicy
-import com.tika.paycard.data.PayCodeRepository
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.work.KeepAlive
 import com.tika.paycard.work.WidgetExpiry
@@ -59,10 +58,7 @@ class PayWidgetProvider : AppWidgetProvider() {
             }
             ACTION_REFRESH -> {
                 KeepAlive.apply(context)
-                fetchAndRender(
-                    context,
-                    revealLite = KeepAlive.getMode(context) == KeepAlive.Mode.LITE
-                )
+                fetchAndRender(context)
             }
         }
     }
@@ -71,24 +67,13 @@ class PayWidgetProvider : AppWidgetProvider() {
     private fun fetchAndRender(
         context: Context,
         manager: AppWidgetManager = AppWidgetManager.getInstance(context),
-        ids: IntArray = widgetIds(context, manager),
-        revealLite: Boolean = false
+        ids: IntArray = widgetIds(context, manager)
     ) {
         if (ids.isEmpty()) return
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val account = AccountStore.get(context).current()
-                if (account != null) {
-                    val result = PayCodeManager.refresh(context, account)
-                    if (
-                        revealLite &&
-                        result is PayCodeRepository.Result.Ok &&
-                        KeepAlive.getMode(context) == KeepAlive.Mode.LITE
-                    ) {
-                        AccountStore.get(context).markWidgetCode(account)
-                    }
-                }
+                AccountStore.get(context).current()?.let { PayCodeManager.refresh(context, it) }
                 refreshAll(context)
             } finally {
                 pending.finish()
@@ -116,18 +101,12 @@ class PayWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context))
         } else {
             views.setTextViewText(R.id.widget_name, account.displayName())
-            val mode = KeepAlive.getMode(context)
-            val canExpire = WidgetExpiry.canSchedule(context)
-            val now = System.currentTimeMillis()
-            val showCode = when (mode) {
-                KeepAlive.Mode.LITE -> account.hasWidgetCode(now)
-                KeepAlive.Mode.STEADY -> account.hasFreshCode(now)
-            }
-            if (canExpire && showCode) {
+            if (account.hasFreshCode()) {
                 val bmp = QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_WIDGET)
                 views.setImageViewBitmap(R.id.widget_qr, bmp)
                 views.setViewVisibility(R.id.widget_qr, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_hint, android.view.View.GONE)
+                // 到点主动撤码,拿不到精确闹钟权限就静默跳过,下次重渲染仍按时效判断
                 WidgetExpiry.schedule(context, account.cachedAt + PayCodePolicy.VALIDITY_MS)
             } else {
                 views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
@@ -140,10 +119,7 @@ class PayWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_qr, openPayIntent(context))
             views.setOnClickPendingIntent(R.id.widget_hint, openPayIntent(context))
             // 点刷新按钮就地拉最新码
-            views.setOnClickPendingIntent(
-                R.id.widget_refresh,
-                if (canExpire) refreshIntent(context) else openPayIntent(context)
-            )
+            views.setOnClickPendingIntent(R.id.widget_refresh, refreshIntent(context))
         }
         // RemoteViews 经 Binder 传桌面进程,事务超限等异常会让这次更新无声丢失,记下来便于定位
         runCatching { manager.updateAppWidget(widgetId, views) }

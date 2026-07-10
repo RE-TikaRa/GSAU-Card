@@ -18,6 +18,7 @@ object WidgetExpiry {
     }
 
     fun schedule(context: Context, expiresAt: Long) {
+        if (!canSchedule(context)) return
         val manager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val delay = (expiresAt - System.currentTimeMillis()).coerceAtLeast(0L)
         manager.setExactAndAllowWhileIdle(

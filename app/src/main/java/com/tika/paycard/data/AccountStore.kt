@@ -78,15 +78,6 @@ class AccountStore private constructor(private val ctx: Context) {
         }
     }
 
-    fun markWidgetCode(account: Account) = synchronized(lock) {
-        val all = list()
-        val current = all.getOrNull(clampIndex(prefs.getInt(KEY_CURRENT, 0), all.size))
-            ?: return@synchronized
-        if (!current.sameCard(account) || current.cachedAt != account.cachedAt) return@synchronized
-        current.widgetCachedAt = current.cachedAt
-        save(all)
-    }
-
     companion object {
         private const val PREFS = "paycard_store"
         private const val KEY_ACCOUNTS = "accounts"

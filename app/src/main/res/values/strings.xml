@@ -80,8 +80,8 @@
     <string name="settings_color_terracotta">陶土</string>
     <string name="settings_color_gray_mauve">灰紫</string>
     <string name="settings_keepalive_title">后台保活</string>
-    <string name="settings_keepalive_desc">付款码一分钟有效，省心档手动获取，稳妥档持续刷新。</string>
-    <string name="settings_mode_lite">省心档：组件手动获取，显示一分钟，无常驻通知</string>
+    <string name="settings_keepalive_desc">付款码一分钟有效，省心档按需刷新，稳妥档持续刷新。</string>
+    <string name="settings_mode_lite">省心档：打开或点刷新时获取，一分钟内有效，无常驻通知</string>
     <string name="settings_mode_steady">稳妥档：前台服务保活，每 30 秒刷新（通知栏有一条常驻低优先级通知）</string>
     <string name="settings_system_title">系统设置</string>
     <string name="settings_battery_on">已加入电池白名单</string>
