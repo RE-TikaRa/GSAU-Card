@@ -58,4 +58,49 @@ class AccountTest {
         val a = Account(openid = "abcd", cardId = "9")
         assertFalse(a.sameCard(null))
     }
+
+    @Test
+    fun `付款码在一分钟内有效`() {
+        val a = Account(
+            openid = "abcd",
+            cardId = "9",
+            cachedCode = "code",
+            cachedAt = 1_000L
+        )
+        assertTrue(a.hasFreshCode(now = 60_999L))
+    }
+
+    @Test
+    fun `付款码满一分钟失效`() {
+        val a = Account(
+            openid = "abcd",
+            cardId = "9",
+            cachedCode = "code",
+            cachedAt = 1_000L
+        )
+        assertFalse(a.hasFreshCode(now = 61_000L))
+    }
+
+    @Test
+    fun `空付款码始终无效`() {
+        val a = Account(openid = "abcd", cardId = "9", cachedAt = 1_000L)
+        assertFalse(a.hasFreshCode(now = 1_001L))
+    }
+
+    @Test
+    fun `未记录获取时间的付款码无效`() {
+        val a = Account(openid = "abcd", cardId = "9", cachedCode = "code")
+        assertFalse(a.hasFreshCode(now = 1L))
+    }
+
+    @Test
+    fun `获取时间晚于当前时间的付款码无效`() {
+        val a = Account(
+            openid = "abcd",
+            cardId = "9",
+            cachedCode = "code",
+            cachedAt = 2_000L
+        )
+        assertFalse(a.hasFreshCode(now = 1_000L))
+    }
 }

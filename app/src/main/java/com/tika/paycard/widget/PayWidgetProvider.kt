@@ -68,7 +68,7 @@ class PayWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context))
         } else {
             views.setTextViewText(R.id.widget_name, account.displayName())
-            if (account.cachedCode.isNotBlank()) {
+            if (account.hasFreshCode()) {
                 val bmp = QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_WIDGET)
                 views.setImageViewBitmap(R.id.widget_qr, bmp)
                 views.setViewVisibility(R.id.widget_qr, android.view.View.VISIBLE)

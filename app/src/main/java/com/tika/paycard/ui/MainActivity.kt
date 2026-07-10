@@ -13,11 +13,15 @@ import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.LinkParser
 import com.tika.paycard.data.PayCodeManager
+import com.tika.paycard.data.PayCodePolicy
 import com.tika.paycard.data.PayCodeRepository
 import com.tika.paycard.databinding.ActivityMainBinding
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -29,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var store: AccountStore
     private lateinit var adapter: AccountAdapter
     private lateinit var appliedScheme: ColorManager.Scheme
+    private var loopJob: Job? = null
+    private var expiryJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +79,13 @@ class MainActivity : AppCompatActivity() {
         KeepAlive.apply(this)
         renderCurrent()
         adapter.submit(store.list(), store.currentIndex())
+        startLoop()
+    }
+
+    override fun onPause() {
+        loopJob?.cancel()
+        expiryJob?.cancel()
+        super.onPause()
     }
 
     private fun showBalance(balance: String) {
@@ -88,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         clearHintAction()
         val account = store.current()
         if (account == null) {
+            expiryJob?.cancel()
             binding.cardName.text = getString(R.string.main_no_card)
             binding.cardBalance.visibility = View.GONE
             binding.cardQr.setImageDrawable(null)
@@ -96,37 +110,76 @@ class MainActivity : AppCompatActivity() {
         }
         binding.cardName.text = account.displayName()
         showBalance(account.balance)
-        if (account.cachedCode.isNotBlank()) {
+        if (account.hasFreshCode()) {
             binding.cardQr.setImageBitmap(
                 QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD)
             )
+            scheduleExpiry(account)
             binding.cardHint.text = getString(R.string.main_tap_qr)
         } else {
+            expiryJob?.cancel()
+            binding.cardQr.setImageDrawable(null)
             binding.cardHint.text = getString(R.string.main_loading)
         }
-        refreshCurrent(account)
     }
 
-    private fun refreshCurrent(account: Account) {
-        lifecycleScope.launch {
-            val r = PayCodeManager.refresh(this@MainActivity, account)
-            // 刷新期间可能已切换账号,只更新仍是当前账号的结果
-            if (!account.sameCard(store.current())) return@launch
-            when (r) {
-                is PayCodeRepository.Result.Ok -> {
-                    clearHintAction()
-                    binding.cardName.text = account.displayName()
-                    showBalance(r.balance)
-                    binding.cardQr.setImageBitmap(
-                        QrGenerator.encode(r.code, QrGenerator.SIZE_CARD)
-                    )
-                    binding.cardHint.text = getString(R.string.main_tap_qr)
-                    adapter.submit(store.list(), store.currentIndex())
-                    PayWidgetProvider.refreshAll(this@MainActivity)
+    private fun startLoop() {
+        loopJob?.cancel()
+        loopJob = lifecycleScope.launch {
+            while (isActive) {
+                val account = store.current()
+                if (account != null) refreshCurrent(account)
+                delay(PayCodePolicy.REFRESH_INTERVAL_MS)
+            }
+        }
+    }
+
+    private suspend fun refreshCurrent(account: Account) {
+        val r = PayCodeManager.refresh(this@MainActivity, account)
+        // 刷新期间可能已切换账号,只更新仍是当前账号的结果
+        if (!account.sameCard(store.current())) return
+        when (r) {
+            is PayCodeRepository.Result.Ok -> {
+                clearHintAction()
+                binding.cardName.text = account.displayName()
+                showBalance(r.balance)
+                binding.cardQr.setImageBitmap(
+                    QrGenerator.encode(r.code, QrGenerator.SIZE_CARD)
+                )
+                scheduleExpiry(account)
+                binding.cardHint.text = getString(R.string.main_tap_qr)
+                adapter.submit(store.list(), store.currentIndex())
+                PayWidgetProvider.refreshAll(this@MainActivity)
+            }
+            is PayCodeRepository.Result.Invalid -> {
+                if (!account.hasFreshCode()) binding.cardQr.setImageDrawable(null)
+                showInvalidHint(account)
+            }
+            is PayCodeRepository.Result.Error -> {
+                if (!account.hasFreshCode()) binding.cardQr.setImageDrawable(null)
+                binding.cardHint.text = getString(R.string.main_fetch_failed, r.message)
+            }
+        }
+    }
+
+    private fun scheduleExpiry(account: Account) {
+        expiryJob?.cancel()
+        val remaining = account.cachedAt + PayCodePolicy.VALIDITY_MS - System.currentTimeMillis()
+        expiryJob = lifecycleScope.launch {
+            delay(remaining.coerceAtLeast(0L))
+            expiryJob = null
+            val current = store.current() ?: return@launch
+            if (!account.sameCard(current)) return@launch
+            if (current.hasFreshCode()) {
+                binding.cardQr.setImageBitmap(
+                    QrGenerator.encode(current.cachedCode, QrGenerator.SIZE_CARD)
+                )
+                scheduleExpiry(current)
+            } else {
+                binding.cardQr.setImageDrawable(null)
+                if (binding.cardHint.text == getString(R.string.main_tap_qr)) {
+                    binding.cardHint.text = getString(R.string.main_loading)
                 }
-                is PayCodeRepository.Result.Invalid -> showInvalidHint(account)
-                is PayCodeRepository.Result.Error ->
-                    binding.cardHint.text = getString(R.string.main_fetch_failed, r.message)
             }
         }
     }
@@ -192,6 +245,7 @@ class MainActivity : AppCompatActivity() {
     private fun selectAccount(index: Int) {
         store.setCurrentIndex(index)
         renderCurrent()
+        startLoop()
         adapter.submit(store.list(), store.currentIndex())
         PayWidgetProvider.refreshAll(this)
     }
@@ -274,6 +328,7 @@ class MainActivity : AppCompatActivity() {
             onPositive = {
                 store.removeAt(index)
                 renderCurrent()
+                startLoop()
                 adapter.submit(store.list(), store.currentIndex())
                 PayWidgetProvider.refreshAll(this)
             }

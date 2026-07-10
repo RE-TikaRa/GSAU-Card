@@ -8,9 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import com.tika.paycard.R
 import com.tika.paycard.data.PayCodeManager
+import com.tika.paycard.data.PayCodePolicy
 import com.tika.paycard.widget.PayWidgetProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +24,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
- * 稳妥档保活:常驻前台服务,内部每 60 秒刷新一次当前账号并更新组件。
+ * 稳妥档保活:常驻前台服务,内部每 30 秒刷新一次当前账号并更新组件。
  * 用低优先级通知,尽量不打扰。用户可在设置里关闭。
  */
 class RefreshService : Service() {
@@ -39,11 +41,12 @@ class RefreshService : Service() {
         if (loopJob?.isActive != true) {
             loopJob = scope.launch {
                 while (isActive) {
-                    runCatching {
-                        PayCodeManager.refreshCurrent(applicationContext)
-                        PayWidgetProvider.refreshAll(applicationContext)
-                    }
-                    delay(INTERVAL_MS)
+                    val startedAt = SystemClock.elapsedRealtime()
+                    PayWidgetProvider.refreshAll(applicationContext)
+                    runCatching { PayCodeManager.refreshCurrent(applicationContext) }
+                    PayWidgetProvider.refreshAll(applicationContext)
+                    val elapsed = SystemClock.elapsedRealtime() - startedAt
+                    delay((PayCodePolicy.REFRESH_INTERVAL_MS - elapsed).coerceAtLeast(0L))
                 }
             }
         }
@@ -83,8 +86,6 @@ class RefreshService : Service() {
     companion object {
         private const val CHANNEL_ID = "paycode_keepalive"
         private const val NOTIF_ID = 1001
-        private const val INTERVAL_MS = 60_000L
-
         fun start(context: Context) {
             val intent = Intent(context, RefreshService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

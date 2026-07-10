@@ -57,7 +57,7 @@
     <string name="pay_no_card">未添加账号</string>
     <string name="pay_no_card_hint">请先在主界面添加校园卡</string>
     <string name="pay_refreshing">刷新中…</string>
-    <string name="pay_auto_refresh">每分钟自动刷新，点二维码可手动刷新</string>
+    <string name="pay_auto_refresh">每 30 秒自动刷新，点二维码可手动刷新</string>
     <string name="pay_invalid">凭证失效，请重新粘贴链接添加</string>
     <string name="pay_refresh_failed">刷新失败：%1$s</string>
     <string name="pay_refresh_button">刷新付款码</string>
@@ -82,7 +82,7 @@
     <string name="settings_keepalive_title">后台保活</string>
     <string name="settings_keepalive_desc">不管选哪档，点开付款页永远实时拉最新码。</string>
     <string name="settings_mode_lite">省心档：后台定时刷新，无常驻通知</string>
-    <string name="settings_mode_steady">稳妥档：前台服务保活，每分钟刷新（通知栏有一条常驻低优先级通知）</string>
+    <string name="settings_mode_steady">稳妥档：前台服务保活，每 30 秒刷新（通知栏有一条常驻低优先级通知）</string>
     <string name="settings_system_title">系统设置</string>
     <string name="settings_battery_on">已加入电池白名单</string>
     <string name="settings_battery_off">未加入电池白名单（建议开启）</string>

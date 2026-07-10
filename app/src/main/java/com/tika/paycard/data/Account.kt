@@ -39,6 +39,11 @@ data class Account(
     fun sameCard(other: Account?): Boolean =
         other != null && openid == other.openid && cardId == other.cardId
 
+    fun hasFreshCode(now: Long = System.currentTimeMillis()): Boolean {
+        val age = now - cachedAt
+        return cachedCode.isNotBlank() && cachedAt > 0L && age in 0 until PayCodePolicy.VALIDITY_MS
+    }
+
     companion object {
         fun fromJson(o: JSONObject) = Account(
             openid = o.getString("openid"),
