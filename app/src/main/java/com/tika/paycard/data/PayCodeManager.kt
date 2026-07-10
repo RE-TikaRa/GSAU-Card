@@ -1,6 +1,8 @@
 package com.tika.paycard.data
 
 import android.content.Context
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * 刷新协调器:抓当前账号(或指定账号)的付款码,成功后回填缓存并通知组件更新。
@@ -8,14 +10,16 @@ import android.content.Context
 object PayCodeManager {
 
     private val repo = PayCodeRepository()
+    private val refreshMutex = Mutex()
 
-    suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
+    suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result = refreshMutex.withLock {
+        val requestedAt = System.currentTimeMillis()
         val result = repo.fetch(account.openid, account.cardId)
         if (result is PayCodeRepository.Result.Ok) {
             val store = AccountStore.get(context)
             account.apply {
                 cachedCode = result.code
-                cachedAt = System.currentTimeMillis()
+                cachedAt = requestedAt
                 if (result.name.isNotBlank()) name = result.name
                 if (result.cardNo.isNotBlank()) cardNo = result.cardNo
                 if (result.balance.isNotBlank()) balance = result.balance
