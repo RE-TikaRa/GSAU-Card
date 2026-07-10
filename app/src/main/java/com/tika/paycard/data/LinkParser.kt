@@ -22,7 +22,7 @@ object LinkParser {
             }
         }
         // 退回正则:有些粘贴内容可能带多余文字
-        val openid = Regex("openid=([0-9A-Fa-f]+)").find(trimmed)?.groupValues?.get(1)
+        val openid = Regex("openid=([A-Za-z0-9_-]+)").find(trimmed)?.groupValues?.get(1)
         if (!openid.isNullOrBlank()) {
             val id = Regex("[?&]id=(\\d+)").find(trimmed)?.groupValues?.get(1) ?: Account.DEFAULT_CARD_ID
             return Parsed(openid, id)

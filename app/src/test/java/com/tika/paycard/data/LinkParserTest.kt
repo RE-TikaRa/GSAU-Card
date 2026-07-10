@@ -33,6 +33,13 @@ class LinkParserTest {
     }
 
     @Test
+    fun `兜底路径识别含字母下划线连字符的 openid`() {
+        val parsed = LinkParser.parse("openid=oMgHu6Ab-cD_xyz12&id=9")
+        assertEquals("oMgHu6Ab-cD_xyz12", parsed?.openid)
+        assertEquals("9", parsed?.cardId)
+    }
+
+    @Test
     fun `没有 openid 返回 null`() {
         assertNull(LinkParser.parse("https://example.com/nothing-here"))
         assertNull(LinkParser.parse(""))
