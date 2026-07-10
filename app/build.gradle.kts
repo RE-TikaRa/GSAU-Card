@@ -66,4 +66,6 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     testImplementation("junit:junit:4.13.2")
+    // JVM 测试里提供真实的 org.json 实现,替换 android.jar 里抛异常的 stub
+    testImplementation("org.json:json:20240303")
 }

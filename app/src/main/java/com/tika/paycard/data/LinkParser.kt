@@ -17,14 +17,14 @@ object LinkParser {
             val uri = Uri.parse(trimmed)
             val openid = uri.getQueryParameter("openid")
             if (!openid.isNullOrBlank()) {
-                val id = uri.getQueryParameter("id") ?: "9"
+                val id = uri.getQueryParameter("id") ?: Account.DEFAULT_CARD_ID
                 return Parsed(openid, id)
             }
         }
         // 退回正则:有些粘贴内容可能带多余文字
         val openid = Regex("openid=([0-9A-Fa-f]+)").find(trimmed)?.groupValues?.get(1)
         if (!openid.isNullOrBlank()) {
-            val id = Regex("[?&]id=(\\d+)").find(trimmed)?.groupValues?.get(1) ?: "9"
+            val id = Regex("[?&]id=(\\d+)").find(trimmed)?.groupValues?.get(1) ?: Account.DEFAULT_CARD_ID
             return Parsed(openid, id)
         }
         return null

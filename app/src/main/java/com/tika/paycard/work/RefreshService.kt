@@ -42,7 +42,6 @@ class RefreshService : Service() {
             loopJob = scope.launch {
                 while (isActive) {
                     val startedAt = SystemClock.elapsedRealtime()
-                    PayWidgetProvider.refreshAll(applicationContext)
                     runCatching { PayCodeManager.refreshCurrent(applicationContext) }
                     PayWidgetProvider.refreshAll(applicationContext)
                     val elapsed = SystemClock.elapsedRealtime() - startedAt
@@ -88,10 +87,13 @@ class RefreshService : Service() {
         private const val NOTIF_ID = 1001
         fun start(context: Context) {
             val intent = Intent(context, RefreshService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            // Android 12+ 后台启前台服务会抛 ForegroundServiceStartNotAllowedException,兜住等下次前台时机再起
+            runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
             }
         }
 

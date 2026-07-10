@@ -45,15 +45,22 @@ data class Account(
     }
 
     companion object {
-        fun fromJson(o: JSONObject) = Account(
-            openid = o.getString("openid"),
-            cardId = o.optString("cardId", "9"),
-            name = o.optString("name", ""),
-            cardNo = o.optString("cardNo", ""),
-            balance = o.optString("balance", ""),
-            cachedCode = o.optString("cachedCode", ""),
-            cachedAt = o.optLong("cachedAt", 0L),
-            alias = o.optString("alias", "")
-        )
+        const val DEFAULT_CARD_ID = "9"
+
+        /** openid 缺失的记录无法换码,直接丢弃。 */
+        fun fromJson(o: JSONObject): Account? {
+            val openid = o.optString("openid", "")
+            if (openid.isBlank()) return null
+            return Account(
+                openid = openid,
+                cardId = o.optString("cardId", DEFAULT_CARD_ID),
+                name = o.optString("name", ""),
+                cardNo = o.optString("cardNo", ""),
+                balance = o.optString("balance", ""),
+                cachedCode = o.optString("cachedCode", ""),
+                cachedAt = o.optLong("cachedAt", 0L),
+                alias = o.optString("alias", "")
+            )
+        }
     }
 }

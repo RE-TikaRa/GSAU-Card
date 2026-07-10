@@ -14,8 +14,10 @@ class AccountStore private constructor(private val ctx: Context) {
 
     fun list(): MutableList<Account> {
         val raw = prefs.getString(KEY_ACCOUNTS, null) ?: return mutableListOf()
-        val arr = JSONArray(raw)
-        return MutableList(arr.length()) { Account.fromJson(arr.getJSONObject(it)) }
+        val arr = runCatching { JSONArray(raw) }.getOrNull() ?: return mutableListOf()
+        return (0 until arr.length())
+            .mapNotNull { arr.optJSONObject(it)?.let(Account::fromJson) }
+            .toMutableList()
     }
 
     fun save(accounts: List<Account>) {
