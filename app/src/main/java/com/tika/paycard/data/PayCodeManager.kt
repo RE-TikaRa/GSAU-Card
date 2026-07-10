@@ -9,24 +9,57 @@ import kotlinx.coroutines.sync.withLock
  */
 object PayCodeManager {
 
+    private data class CardKey(val openid: String, val cardId: String)
+
+    private data class Outcome(
+        val completedAt: Long,
+        val result: PayCodeRepository.Result,
+        val account: Account?
+    )
+
     private val repo = PayCodeRepository()
     private val refreshMutex = Mutex()
+    private val outcomes = mutableMapOf<CardKey, Outcome>()
 
-    suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result = refreshMutex.withLock {
-        val requestedAt = System.currentTimeMillis()
-        val result = repo.fetch(account.openid, account.cardId)
-        if (result is PayCodeRepository.Result.Ok) {
-            val store = AccountStore.get(context)
-            account.apply {
-                cachedCode = result.code
-                cachedAt = requestedAt
-                if (result.name.isNotBlank()) name = result.name
-                if (result.cardNo.isNotBlank()) cardNo = result.cardNo
-                if (result.balance.isNotBlank()) balance = result.balance
+    suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
+        val key = CardKey(account.openid, account.cardId)
+        val invokedAt = System.nanoTime()
+        return refreshMutex.withLock {
+            outcomes[key]?.takeIf { it.completedAt >= invokedAt }?.let { outcome ->
+                outcome.account?.let { account.copyFrom(it) }
+                return@withLock outcome.result
             }
-            store.update(account)
+
+            val store = AccountStore.get(context)
+            val requestedAt = System.currentTimeMillis()
+            val result = repo.fetch(account.openid, account.cardId)
+            if (result is PayCodeRepository.Result.Ok) {
+                store.list().firstOrNull { it.sameCard(account) }?.let { account.copyFrom(it) }
+                account.apply {
+                    cachedCode = result.code
+                    cachedAt = requestedAt
+                    if (result.name.isNotBlank()) name = result.name
+                    if (result.cardNo.isNotBlank()) cardNo = result.cardNo
+                    if (result.balance.isNotBlank()) balance = result.balance
+                }
+                store.update(account)
+            }
+            outcomes[key] = Outcome(
+                completedAt = System.nanoTime(),
+                result = result,
+                account = if (result is PayCodeRepository.Result.Ok) account.copy() else null
+            )
+            return result
         }
-        return result
+    }
+
+    private fun Account.copyFrom(source: Account) {
+        name = source.name
+        cardNo = source.cardNo
+        balance = source.balance
+        cachedCode = source.cachedCode
+        cachedAt = source.cachedAt
+        alias = source.alias
     }
 
     suspend fun refreshCurrent(context: Context): PayCodeRepository.Result {
