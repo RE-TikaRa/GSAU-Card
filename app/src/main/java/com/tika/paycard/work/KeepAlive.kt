@@ -22,8 +22,8 @@ object KeepAlive {
 
     fun getMode(context: Context): Mode {
         val v = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_MODE, Mode.STEADY.name)
-        return runCatching { Mode.valueOf(v!!) }.getOrDefault(Mode.STEADY)
+            .getString(KEY_MODE, Mode.LITE.name)
+        return runCatching { Mode.valueOf(v!!) }.getOrDefault(Mode.LITE)
     }
 
     fun setMode(context: Context, mode: Mode) {

@@ -60,6 +60,7 @@ object PayCodeManager {
         balance = source.balance
         cachedCode = source.cachedCode
         cachedAt = source.cachedAt
+        widgetCachedAt = source.widgetCachedAt
         alias = source.alias
     }
 
