@@ -1,6 +1,8 @@
 package com.tika.paycard.data
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
@@ -28,12 +30,22 @@ class PayCodeRepository(private val client: Call.Factory = Http.client) {
             .url(url)
             .header("User-Agent", UA)
             .build()
+        val response = try {
+            client.await(req)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.Error(e.message ?: "网络错误")
+        }
         return try {
-            client.await(req).use { resp ->
-                if (!resp.isSuccessful) Result.Error("HTTP ${resp.code}")
-                else parse(resp.body?.string().orEmpty())
+            withContext(Dispatchers.IO) {
+                response.use { resp ->
+                    if (!resp.isSuccessful) Result.Error("HTTP ${resp.code}")
+                    else parse(resp.body?.string().orEmpty())
+                }
             }
         } catch (e: CancellationException) {
+            response.close()
             throw e
         } catch (e: Exception) {
             Result.Error(e.message ?: "网络错误")

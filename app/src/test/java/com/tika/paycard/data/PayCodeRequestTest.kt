@@ -1,6 +1,7 @@
 package com.tika.paycard.data
 
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
@@ -16,6 +17,7 @@ import okio.Buffer
 import okio.Timeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -89,6 +91,24 @@ class PayCodeRequestTest {
         assertTrue(body.closed)
     }
 
+    @Test
+    fun `响应体读取在线程池执行`() = runBlocking {
+        lateinit var call: PendingCall
+        val caller = Thread.currentThread()
+        val responseThread = AtomicReference<Thread>()
+        val repo = PayCodeRepository { request -> PendingCall(request).also { call = it } }
+        val result = async(start = CoroutineStart.UNDISPATCHED) { repo.fetch("first", "9") }
+        val body = Body("<input id=\"code\" value=\"deadbeef\" />") {
+            responseThread.set(Thread.currentThread())
+        }
+
+        call.respond(body)
+
+        assertEquals(PayCodeRepository.Result.Ok("deadbeef", "", "", ""), result.await())
+        assertNotSame(caller, responseThread.get())
+        assertTrue(body.closed)
+    }
+
     private class PendingCall(private val request: Request) : Call {
         lateinit var callback: Callback
         private var canceled = false
@@ -120,14 +140,14 @@ class PayCodeRequestTest {
         }
     }
 
-    private class Body(content: String) : ResponseBody() {
+    private class Body(content: String, private val onRead: () -> Unit = {}) : ResponseBody() {
         private val buffer = Buffer().writeUtf8(content)
         private val length = buffer.size
         var closed = false
 
         override fun contentType() = "text/html; charset=utf-8".toMediaType()
         override fun contentLength() = length
-        override fun source() = buffer
+        override fun source() = buffer.apply { onRead() }
         override fun close() {
             closed = true
             super.close()
