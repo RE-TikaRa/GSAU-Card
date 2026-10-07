@@ -265,6 +265,26 @@
                 android:layout_marginTop="12dp" />
 
             <TextView
+                android:id="@+id/alarmStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="@string/settings_alarm_off"
+                android:textColor="@color/text_hint"
+                android:textSize="13sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnAlarm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_alarm_button"
+                android:textColor="@color/text_dark"
+                android:background="@drawable/bg_button_tonal"
+                android:stateListAnimator="@null"
+                android:paddingVertical="12dp" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_about_title"

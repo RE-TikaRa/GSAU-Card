@@ -72,4 +72,5 @@ dependencies {
     // JVM 测试里提供真实的 org.json 实现,替换 android.jar 里抛异常的 stub
     testImplementation("org.json:json:20240303")
     testImplementation("org.robolectric:robolectric:4.17")
+    testImplementation("androidx.work:work-testing:2.9.1")
 }

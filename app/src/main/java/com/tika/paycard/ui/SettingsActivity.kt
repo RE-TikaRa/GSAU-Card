@@ -3,8 +3,11 @@ package com.tika.paycard.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -12,6 +15,7 @@ import com.tika.paycard.R
 import com.tika.paycard.databinding.ActivitySettingsBinding
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
+import com.tika.paycard.work.WidgetExpiry
 
 /**
  * 设置页:保活档位选择 + 电池白名单跳转 + 各家 ROM 自启动引导。
@@ -77,6 +81,15 @@ class SettingsActivity : AppCompatActivity() {
         binding.btnAutostart.setOnClickListener {
             KeepAlive.openAutoStartSettings(this)
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            binding.btnAlarm.setOnClickListener {
+                startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = Uri.parse("package:$packageName")
+                })
+            }
+        } else {
+            binding.btnAlarm.visibility = View.GONE
+        }
         binding.btnAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
@@ -117,5 +130,10 @@ class SettingsActivity : AppCompatActivity() {
             if (KeepAlive.isIgnoringBattery(this)) R.string.settings_battery_on
             else R.string.settings_battery_off
         )
+        binding.alarmStatus.text = getString(
+            if (WidgetExpiry.canSchedule(this)) R.string.settings_alarm_on
+            else R.string.settings_alarm_off
+        )
+        PayWidgetProvider.refreshAll(this)
     }
 }

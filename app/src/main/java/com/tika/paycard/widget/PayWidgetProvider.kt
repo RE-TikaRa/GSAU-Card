@@ -1,5 +1,6 @@
 package com.tika.paycard.widget
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -47,6 +48,7 @@ class PayWidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
         when (intent.action) {
             WidgetExpiry.ACTION -> renderAll(context)
+            AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> renderAll(context)
             ACTION_RENDER -> renderAll(context, intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS))
             ACTION_SWITCH -> {
                 KeepAlive.apply(context)
@@ -101,17 +103,20 @@ class PayWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_root, openAppIntent(context))
         } else {
             views.setTextViewText(R.id.widget_name, account.displayName())
-            if (account.hasFreshCode()) {
+            val canExpire = WidgetExpiry.canSchedule(context)
+            if (canExpire && account.hasFreshCode()) {
                 val bmp = QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_WIDGET)
                 views.setImageViewBitmap(R.id.widget_qr, bmp)
                 views.setViewVisibility(R.id.widget_qr, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_hint, android.view.View.GONE)
-                // 到点主动撤码,拿不到精确闹钟权限就静默跳过,下次重渲染仍按时效判断
                 WidgetExpiry.schedule(context, account.cachedAt + PayCodePolicy.VALIDITY_MS)
             } else {
                 views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
-                views.setTextViewText(R.id.widget_hint, context.getString(R.string.widget_tap_refresh))
+                views.setTextViewText(
+                    R.id.widget_hint,
+                    context.getString(if (canExpire) R.string.widget_tap_refresh else R.string.widget_open_pay)
+                )
             }
             // 点姓名条切换用户
             views.setOnClickPendingIntent(R.id.widget_name, switchIntent(context))
@@ -119,7 +124,10 @@ class PayWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_qr, openPayIntent(context))
             views.setOnClickPendingIntent(R.id.widget_hint, openPayIntent(context))
             // 点刷新按钮就地拉最新码
-            views.setOnClickPendingIntent(R.id.widget_refresh, refreshIntent(context))
+            views.setOnClickPendingIntent(
+                R.id.widget_refresh,
+                if (canExpire) refreshIntent(context) else openPayIntent(context)
+            )
         }
         // RemoteViews 经 Binder 传桌面进程,事务超限等异常会让这次更新无声丢失,记下来便于定位
         runCatching { manager.updateAppWidget(widgetId, views) }

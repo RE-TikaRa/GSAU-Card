@@ -66,6 +66,7 @@
     <string name="widget_add_card">点击添加校园卡</string>
     <string name="widget_no_account">未添加账号</string>
     <string name="widget_tap_refresh">点击刷新付款码</string>
+    <string name="widget_open_pay">点击进入付款页</string>
 
     <!-- 设置页 -->
     <string name="settings_title">设置</string>
@@ -88,6 +89,9 @@
     <string name="settings_battery_off">未加入电池白名单（建议开启）</string>
     <string name="settings_battery_button">加入电池白名单</string>
     <string name="settings_autostart_button">打开自启动管理（小米/OPPO/vivo）</string>
+    <string name="settings_alarm_on">已允许组件在付款码到期时自动清除</string>
+    <string name="settings_alarm_off">开启闹钟和提醒权限后，组件可显示付款码并在到期时清除。未开启时，点击组件进入付款页。</string>
+    <string name="settings_alarm_button">开启闹钟和提醒权限</string>
     <string name="settings_rom_hint">国产 ROM 的省电策略较强，建议同时开启电池白名单和自启动，后台刷新才稳。</string>
     <string name="settings_mode_steady_tip">已开启前台服务保活（通知栏会有一条常驻通知）</string>
     <string name="settings_mode_lite_tip">已切到省心档（点组件刷新按钮获取付款码）</string>
