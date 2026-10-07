@@ -2,6 +2,7 @@ package com.tika.paycard.data
 
 import android.content.Context
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -18,39 +19,52 @@ object PayCodeManager {
         val account: Account?
     )
 
+    private class Entry(
+        val mutex: Mutex = Mutex(),
+        val waiters: AtomicInteger = AtomicInteger(),
+        @Volatile var outcome: Outcome? = null
+    )
+
     private val repo = PayCodeRepository()
-    private val refreshMutexes = ConcurrentHashMap<CardKey, Mutex>()
-    private val outcomes = ConcurrentHashMap<CardKey, Outcome>()
+    private val entries = ConcurrentHashMap<CardKey, Entry>()
 
     suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
         val key = CardKey(account.openid, account.cardId)
         val invokedAt = System.nanoTime()
-        return refreshMutexes.computeIfAbsent(key) { Mutex() }.withLock {
-            outcomes[key]?.takeIf { it.completedAt >= invokedAt }?.let { outcome ->
-                outcome.account?.let { account.copyFrom(it) }
-                return@withLock outcome.result
-            }
-
-            val store = AccountStore.get(context)
-            val requestedAt = System.currentTimeMillis()
-            val result = repo.fetch(account.openid, account.cardId)
-            if (result is PayCodeRepository.Result.Ok) {
-                store.list().firstOrNull { it.sameCard(account) }?.let { account.copyFrom(it) }
-                account.apply {
-                    cachedCode = result.code
-                    cachedAt = requestedAt
-                    if (result.name.isNotBlank()) name = result.name
-                    if (result.cardNo.isNotBlank()) cardNo = result.cardNo
-                    if (result.balance.isNotBlank()) balance = result.balance
+        val entry = entries.computeIfAbsent(key) { Entry() }
+        entry.waiters.incrementAndGet()
+        try {
+            return entry.mutex.withLock {
+                entry.outcome?.takeIf { it.completedAt >= invokedAt }?.let { outcome ->
+                    outcome.account?.let { account.copyFrom(it) }
+                    return@withLock outcome.result
                 }
-                store.update(account)
+
+                val store = AccountStore.get(context)
+                val requestedAt = System.currentTimeMillis()
+                val result = repo.fetch(account.openid, account.cardId)
+                if (result is PayCodeRepository.Result.Ok) {
+                    store.list().firstOrNull { it.sameCard(account) }?.let { account.copyFrom(it) }
+                    account.apply {
+                        cachedCode = result.code
+                        cachedAt = requestedAt
+                        if (result.name.isNotBlank()) name = result.name
+                        if (result.cardNo.isNotBlank()) cardNo = result.cardNo
+                        if (result.balance.isNotBlank()) balance = result.balance
+                    }
+                    store.update(account)
+                }
+                entry.outcome = Outcome(
+                    completedAt = System.nanoTime(),
+                    result = result,
+                    account = if (result is PayCodeRepository.Result.Ok) account.copy() else null
+                )
+                return@withLock result
             }
-            outcomes[key] = Outcome(
-                completedAt = System.nanoTime(),
-                result = result,
-                account = if (result is PayCodeRepository.Result.Ok) account.copy() else null
-            )
-            return result
+        } finally {
+            if (entry.waiters.decrementAndGet() == 0) {
+                entries.remove(key, entry)
+            }
         }
     }
 

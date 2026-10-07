@@ -16,17 +16,34 @@ object LinkParser {
         runCatching {
             val uri = Uri.parse(trimmed)
             val openid = uri.getQueryParameter("openid")
-            if (!openid.isNullOrBlank()) {
-                val id = uri.getQueryParameter("id") ?: Account.DEFAULT_CARD_ID
-                return Parsed(openid, id)
+            if (openid != null && isValidOpenid(openid)) {
+                val rawId = uri.getQueryParameter("id")
+                if (rawId == null) return Parsed(openid, Account.DEFAULT_CARD_ID)
+                parseCardId(rawId)?.let { return Parsed(openid, it) }
+                return null
             }
         }
         // 退回正则:有些粘贴内容可能带多余文字
-        val openid = Regex("openid=([A-Za-z0-9_-]+)").find(trimmed)?.groupValues?.get(1)
-        if (!openid.isNullOrBlank()) {
-            val id = Regex("[?&]id=(\\d+)").find(trimmed)?.groupValues?.get(1) ?: Account.DEFAULT_CARD_ID
-            return Parsed(openid, id)
+        val openid = OPENID_RE.find(trimmed)?.groupValues?.get(1)
+        if (openid != null && isValidOpenid(openid)) {
+            val rawId = RAW_ID_RE.find(trimmed)?.groupValues?.get(1)
+            if (rawId == null) return Parsed(openid, Account.DEFAULT_CARD_ID)
+            if (rawId.matches(ID_PATTERN)) return Parsed(openid, rawId)
+            return null
         }
         return null
     }
+
+    private fun parseCardId(value: String?): String? = when {
+        value == null -> Account.DEFAULT_CARD_ID
+        value.matches(ID_PATTERN) -> value
+        else -> null
+    }
+
+    private fun isValidOpenid(value: String?): Boolean = value != null && value.matches(OPENID_PATTERN)
+
+    private val OPENID_PATTERN = Regex("[A-Za-z0-9_-]+")
+    private val OPENID_RE = Regex("openid=([A-Za-z0-9_-]+)(?![A-Za-z0-9_-])")
+    private val ID_PATTERN = Regex("\\d+")
+    private val RAW_ID_RE = Regex("(?:^|[?&])id=([^&\\s]+)")
 }

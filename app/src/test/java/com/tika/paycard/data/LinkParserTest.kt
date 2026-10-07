@@ -44,4 +44,9 @@ class LinkParserTest {
         assertNull(LinkParser.parse("https://example.com/nothing-here"))
         assertNull(LinkParser.parse(""))
     }
+
+    @Test
+    fun `非法卡号不会被提交`() {
+        assertNull(LinkParser.parse("openid=abcd1234&id=9x"))
+    }
 }

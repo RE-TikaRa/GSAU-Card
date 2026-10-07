@@ -1,8 +1,10 @@
 package com.tika.paycard.data
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import okhttp3.Request
+import org.json.JSONObject
 
 /**
  * 读 GitHub Releases 最新版,与当前 versionName 比对。
@@ -25,27 +27,35 @@ object UpdateChecker {
             .header("Accept", "application/vnd.github+json")
             .build()
         try {
-            client.newCall(req).execute().use { resp ->
+            client.await(req).use { resp ->
                 if (!resp.isSuccessful) return@withContext Result.Error("HTTP ${resp.code}")
                 parse(resp.body?.string().orEmpty(), currentVersion)
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Result.Error(e.message ?: "网络错误")
         }
     }
 
     internal fun parse(json: String, currentVersion: String): Result {
-        val tag = TAG_RE.find(json)?.groupValues?.get(1) ?: return Result.Error("解析失败")
+        val root = runCatching { JSONObject(json) }.getOrNull() ?: return Result.Error("解析失败")
+        val tag = root.optString("tag_name").takeIf { it.isNotBlank() } ?: return Result.Error("解析失败")
         val latest = tag.removePrefix("v")
         if (compareVersion(latest, currentVersion) <= 0) return Result.UpToDate
-        val apkUrl = APK_RE.find(json)?.groupValues?.get(1)?.let(::proxied)
+        val assets = root.optJSONArray("assets") ?: return Result.Error("未找到安装包")
+        val apkUrl = (0 until assets.length())
+            .asSequence()
+            .mapNotNull { assets.optJSONObject(it)?.optString("browser_download_url") }
+            .firstOrNull { it.endsWith(".apk") }
+            ?.let(::proxied)
             ?: return Result.Error("未找到安装包")
-        val pageUrl = PAGE_RE.find(json)?.groupValues?.get(1)?.let(::proxied).orEmpty()
+        val pageUrl = proxied(root.optString("html_url"))
         return Result.NewVersion(latest, apkUrl, pageUrl)
     }
 
     /** 把 github.com 原始链接换成走 Cloudflare 的镜像域名,下载与页面都经代理。 */
-    private fun proxied(url: String) = url.replace("https://github.com", PROXY)
+    private fun proxied(url: String) = url.replaceFirst("^https://github\\.com".toRegex(), PROXY)
 
     /** 按点分段逐段比较数字,a>b 返回正数,相等返回 0。 */
     private fun compareVersion(a: String, b: String): Int {
@@ -61,7 +71,4 @@ object UpdateChecker {
 
     private const val PROXY = "https://gh.re-tikara.fun"
     private const val LATEST = "$PROXY/api/repos/RE-TikaRa/GSAU-Card/releases/latest"
-    private val TAG_RE = Regex(""""tag_name"\s*:\s*"([^"]+)"""")
-    private val APK_RE = Regex(""""browser_download_url"\s*:\s*"([^"]+\.apk)"""")
-    private val PAGE_RE = Regex(""""html_url"\s*:\s*"([^"]+/releases/tag/[^"]+)"""")
 }

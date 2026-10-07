@@ -7,9 +7,9 @@ import org.json.JSONArray
  * 多账号存储。用 SharedPreferences 存账号列表和当前选中索引。
  * app 与桌面组件共享同一份数据,切换用户即改动 currentIndex。
  */
-class AccountStore internal constructor(private val ctx: Context) {
+class AccountStore internal constructor(context: Context) {
 
-    private val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val lock = Any()
 
     fun list(): MutableList<Account> {

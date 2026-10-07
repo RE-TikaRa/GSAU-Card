@@ -58,6 +58,19 @@ class PayCodeRepositoryTest {
         assertEquals("", r.balance)
     }
 
+    @Test
+    fun `属性顺序和单双引号变化仍能解析`() {
+        val r = repo.parse(
+            """<input value='${HEX_CODE.uppercase()}' data-x='1' id='code'>
+                <p data-x='1' class='other bdb'>张三:1073325020408 余额:8.00元</p>"""
+        )
+        assertTrue(r is PayCodeRepository.Result.Ok)
+        r as PayCodeRepository.Result.Ok
+        assertEquals(HEX_CODE.uppercase(), r.code)
+        assertEquals("张三", r.name)
+        assertEquals("8.00元", r.balance)
+    }
+
     companion object {
         private const val HEX_CODE = "0a1b2c3d4e5f60718293a4b5c6d7e8f9"
     }

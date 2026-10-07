@@ -1,12 +1,9 @@
 package com.tika.paycard.data
 
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.CancellationException
 import okhttp3.Call
-import okhttp3.Callback
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
-import okhttp3.Response
 
 /**
  * 抓取付款码页面并解析出付款码内容与账户信息。
@@ -22,36 +19,32 @@ class PayCodeRepository(private val client: Call.Factory = Http.client) {
     }
 
     suspend fun fetch(openid: String, cardId: String): Result {
-        val url = "$BASE?openid=$openid&displayflag=1&id=$cardId"
+        val url = BASE.toHttpUrl().newBuilder()
+            .addQueryParameter("openid", openid)
+            .addQueryParameter("displayflag", "1")
+            .addQueryParameter("id", cardId)
+            .build()
         val req = Request.Builder()
             .url(url)
             .header("User-Agent", UA)
             .build()
-        return suspendCancellableCoroutine { continuation ->
-            val call = client.newCall(req)
-            continuation.invokeOnCancellation { call.cancel() }
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    continuation.resume(Result.Error(e.message ?: "网络错误"))
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val result = try {
-                        response.use { resp ->
-                            if (resp.isSuccessful) parse(resp.body?.string().orEmpty())
-                            else Result.Error("HTTP ${resp.code}")
-                        }
-                    } catch (e: Exception) {
-                        Result.Error(e.message ?: "网络错误")
-                    }
-                    continuation.resume(result)
-                }
-            })
+        return try {
+            client.await(req).use { resp ->
+                if (!resp.isSuccessful) Result.Error("HTTP ${resp.code}")
+                else parse(resp.body?.string().orEmpty())
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "网络错误")
         }
     }
 
     internal fun parse(html: String): Result {
-        val code = CODE_RE.find(html)?.groupValues?.get(1)
+        val code = CODE_RES
+            .asSequence()
+            .mapNotNull { it.find(html)?.groupValues?.get(1) }
+            .firstOrNull()
         if (code.isNullOrBlank()) return Result.Invalid
 
         // p.bdb 文本形如: 郎振杰：1073325020407 余额：16.43元
@@ -74,8 +67,20 @@ class PayCodeRepository(private val client: Call.Factory = Http.client) {
             "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) " +
             "Version/4.0 Chrome/108.0.0.0 Mobile Safari/537.36 MicroMessenger/8.0.30"
 
-        private val CODE_RE = Regex("""id="code"\s+value="([0-9A-Fa-f]+)"""")
-        private val BDB_RE = Regex("""<p class="bdb">([^<]*)</p>""")
+        private val CODE_RES = listOf(
+            Regex(
+            """\bid\s*=\s*["']code["'][^>]*\bvalue\s*=\s*["']([0-9A-Fa-f]+)["']""",
+            RegexOption.IGNORE_CASE
+            ),
+            Regex(
+                """\bvalue\s*=\s*["']([0-9A-Fa-f]+)["'][^>]*\bid\s*=\s*["']code["']""",
+                RegexOption.IGNORE_CASE
+            )
+        )
+        private val BDB_RE = Regex(
+            """<p\b[^>]*\bclass\s*=\s*["'][^"']*\bbdb\b[^"']*["'][^>]*>(.*?)</p>""",
+            setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+        )
         private val NAME_CARD_RE = Regex("""(.+?)[：:]\s*(\d+)""")
         private val BAL_RE = Regex("""余额[：:]\s*([0-9.]+元?)""")
     }
