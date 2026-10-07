@@ -206,6 +206,7 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 ```
 
 产物在 `app/build/outputs/apk/debug/app-debug.apk`。依赖仓库默认走阿里云镜像（见 `settings.gradle.kts`），国内构建更稳。
+Debug 包使用独立的 `com.tika.paycard.debug` 包名，可以和正式版并存安装，不会覆盖正式版数据。
 
 ## 发布新版本
 

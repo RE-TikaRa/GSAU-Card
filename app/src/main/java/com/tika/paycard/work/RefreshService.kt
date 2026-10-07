@@ -9,10 +9,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.os.SystemClock
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.tika.paycard.R
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodePolicy
+import com.tika.paycard.data.AccountStore
 import com.tika.paycard.widget.PayWidgetProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,8 +43,16 @@ class RefreshService : Service() {
         if (loopJob?.isActive != true) {
             loopJob = scope.launch {
                 while (isActive) {
+                    if (AccountStore.get(applicationContext).current() == null) {
+                        stopSelf()
+                        return@launch
+                    }
                     val startedAt = SystemClock.elapsedRealtime()
                     runCatching { PayCodeManager.refreshCurrent(applicationContext) }
+                        .onFailure {
+                            if (it is kotlinx.coroutines.CancellationException) throw it
+                            Log.w(TAG, "后台刷新失败", it)
+                        }
                     PayWidgetProvider.refreshAll(applicationContext)
                     val elapsed = SystemClock.elapsedRealtime() - startedAt
                     delay((PayCodePolicy.REFRESH_INTERVAL_MS - elapsed).coerceAtLeast(0L))
@@ -83,6 +93,7 @@ class RefreshService : Service() {
     }
 
     companion object {
+        private const val TAG = "RefreshService"
         private const val CHANNEL_ID = "paycode_keepalive"
         private const val NOTIF_ID = 1001
         fun start(context: Context) {

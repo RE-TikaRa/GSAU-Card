@@ -37,6 +37,7 @@ jobs:
         run: |
           chmod +x gradlew
           export VERSION_NAME="${GITHUB_REF_NAME#v}"
+          ./gradlew testDebugUnitTest lintDebug --console=plain
           ./gradlew assembleRelease --console=plain
 
       - name: Rename APK
