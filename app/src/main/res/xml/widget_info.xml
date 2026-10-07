@@ -4,7 +4,7 @@
     android:minWidth="140dp"
     android:minHeight="180dp"
     android:targetCellWidth="2"
-    android:targetCellHeight="3"
+    android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_paycard"
     android:previewLayout="@layout/widget_paycard"
