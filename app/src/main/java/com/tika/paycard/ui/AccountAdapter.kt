@@ -2,6 +2,7 @@ package com.tika.paycard.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.tika.paycard.R
 import com.tika.paycard.data.Account
@@ -19,9 +20,27 @@ class AccountAdapter(
     private var currentIndex: Int = -1
 
     fun submit(list: List<Account>, current: Int) {
+        val oldItems = items
+        val oldCurrent = currentIndex
         items = list
         currentIndex = current
-        notifyDataSetChanged()
+        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = oldItems.size
+            override fun getNewListSize() = items.size
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+                oldItems[oldItemPosition].sameCard(items[newItemPosition])
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+                oldItems[oldItemPosition] == items[newItemPosition]
+        }).dispatchUpdatesTo(this)
+        val indicatorUpdates = buildSet {
+            oldItems.getOrNull(oldCurrent)?.let { account ->
+                items.indexOfFirst { it.sameCard(account) }.takeIf { it >= 0 }?.let(::add)
+            }
+            items.getOrNull(current)?.let { account ->
+                items.indexOfFirst { it.sameCard(account) }.takeIf { it >= 0 }?.let(::add)
+            }
+        }
+        indicatorUpdates.forEach(::notifyItemChanged)
     }
 
     inner class VH(val binding: ItemAccountBinding) : RecyclerView.ViewHolder(binding.root)

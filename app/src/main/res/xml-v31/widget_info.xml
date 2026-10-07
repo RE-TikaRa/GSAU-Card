@@ -3,7 +3,10 @@
     android:label="@string/widget_label"
     android:minWidth="140dp"
     android:minHeight="180dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_paycard"
+    android:previewLayout="@layout/widget_paycard"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />
