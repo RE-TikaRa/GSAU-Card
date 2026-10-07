@@ -1,6 +1,12 @@
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag
+        required: true
+        type: string
   push:
     tags:
       - 'v*'
@@ -21,6 +27,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Decode keystore
         env:
@@ -30,23 +38,27 @@ jobs:
       - name: Build release APK
         env:
           VERSION_CODE: ${{ github.run_number }}
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
           KEYSTORE_FILE: ${{ runner.temp }}/release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          export VERSION_NAME="${GITHUB_REF_NAME#v}"
+          export VERSION_NAME="${RELEASE_TAG#v}"
           ./gradlew testDebugUnitTest lintDebug --console=plain
           ./gradlew assembleRelease --console=plain
 
       - name: Rename APK
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/GSAU-Card-${{ github.ref_name }}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "dist/GSAU-Card-${RELEASE_TAG}.apk"
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/GSAU-Card-${{ github.ref_name }}.apk
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          files: dist/GSAU-Card-${{ inputs.release_tag || github.ref_name }}.apk
           generate_release_notes: true
