@@ -203,21 +203,20 @@ class MainActivity : AppCompatActivity() {
         binding.cardHint.setOnClickListener { showRebindDialog(account) }
     }
 
-    /** 用新链接就地替换当前失效卡,openid 换新,cardId 沿用原卡。 */
+    /** 用新链接替换失效卡,保留备注与列表位置。 */
     private fun showRebindDialog(invalid: Account) {
-        val index = store.list().indexOfFirst { it.sameCard(invalid) }
-        if (index < 0) return
+        if (store.list().none { it.sameCard(invalid) }) return
         AppDialog.input(
             context = this,
             title = getString(R.string.rebind_dialog_title, invalid.displayName()),
             message = getString(R.string.rebind_dialog_message),
             hint = getString(R.string.add_dialog_hint),
             positiveText = getString(R.string.rebind_action),
-            onPositive = { link -> rebind(index, link) }
+            onPositive = { link -> rebind(invalid, link) }
         )
     }
 
-    private fun rebind(index: Int, link: String) {
+    private fun rebind(original: Account, link: String) {
         val parsed = LinkParser.parse(link)
         if (parsed == null) {
             AppDialog.notice(binding.root, getString(R.string.add_no_openid))
@@ -227,7 +226,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             when (val r = PayCodeManager.refresh(this@MainActivity, account)) {
                 is PayCodeRepository.Result.Ok -> {
-                    store.replaceAt(index, account)
+                    val index = store.replace(original, account) ?: return@launch
                     store.setCurrentIndex(index)
                     renderCurrent()
                     adapter.submit(store.list(), store.currentIndex())
@@ -309,7 +308,7 @@ class MainActivity : AppCompatActivity() {
             hint = getString(R.string.rename_dialog_hint),
             positiveText = getString(R.string.rename_action),
             onPositive = { input ->
-                store.update(account.copy(alias = input.trim()))
+                store.rename(account, input.trim())
                 renderCurrent()
                 adapter.submit(store.list(), store.currentIndex())
                 PayWidgetProvider.refreshAll(this)

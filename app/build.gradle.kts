@@ -52,6 +52,9 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -68,4 +71,5 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     // JVM 测试里提供真实的 org.json 实现,替换 android.jar 里抛异常的 stub
     testImplementation("org.json:json:20240303")
+    testImplementation("org.robolectric:robolectric:4.17")
 }

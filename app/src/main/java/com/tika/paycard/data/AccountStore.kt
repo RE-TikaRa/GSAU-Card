@@ -7,7 +7,7 @@ import org.json.JSONArray
  * 多账号存储。用 SharedPreferences 存账号列表和当前选中索引。
  * app 与桌面组件共享同一份数据,切换用户即改动 currentIndex。
  */
-class AccountStore private constructor(private val ctx: Context) {
+class AccountStore internal constructor(private val ctx: Context) {
 
     private val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val lock = Any()
@@ -63,10 +63,21 @@ class AccountStore private constructor(private val ctx: Context) {
     }
 
     /** 就地替换某张卡,保持它在列表中的位置。凭证失效后重新绑定用。 */
-    fun replaceAt(i: Int, account: Account) = synchronized(lock) {
+    fun replace(original: Account, account: Account): Int? = synchronized(lock) {
         val all = list()
-        if (i !in all.indices) return@synchronized
+        val i = all.indexOfFirst { it.sameCard(original) }
+        if (i < 0) return@synchronized null
+        account.alias = all[i].alias
         all[i] = account
+        save(all)
+        i
+    }
+
+    fun rename(account: Account, alias: String) = synchronized(lock) {
+        val all = list()
+        val i = all.indexOfFirst { it.sameCard(account) }
+        if (i < 0) return@synchronized
+        all[i].alias = alias
         save(all)
     }
 
@@ -75,6 +86,7 @@ class AccountStore private constructor(private val ctx: Context) {
         val all = list()
         val i = all.indexOfFirst { it.sameCard(account) }
         if (i >= 0) {
+            account.alias = all[i].alias
             all[i] = account
             save(all)
         }
