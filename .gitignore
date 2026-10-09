@@ -17,6 +17,7 @@ local.properties
 
 # OMC 运行状态
 .omc/
+.cloudflare/
 
 # IDE
 .idea/
