@@ -286,6 +286,45 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/settings_config_title"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_config_desc"
+                android:textColor="@color/text_hint"
+                android:textSize="13sp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnExport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/config_export_button"
+                android:textColor="@color/on_primary"
+                android:background="@drawable/bg_button"
+                android:stateListAnimator="@null"
+                android:paddingVertical="12dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnImport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/config_import_button"
+                android:textColor="@color/text_dark"
+                android:background="@drawable/bg_button_tonal"
+                android:stateListAnimator="@null"
+                android:paddingVertical="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/settings_about_title"
                 android:textColor="@color/text_dark"
                 android:textSize="18sp"

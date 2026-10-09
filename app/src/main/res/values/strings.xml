@@ -103,6 +103,20 @@
     <string name="settings_mode_steady_tip">已开启前台服务保活（通知栏会有一条常驻通知）</string>
     <string name="settings_mode_lite_tip">已切到省心档（点组件刷新按钮获取付款码）</string>
 
+    <!-- 卡片配置 -->
+    <string name="settings_config_title">卡片配置</string>
+    <string name="settings_config_desc">将已添加的卡片链接、备注和当前卡片保存为配置文件。重装或换机后可导入恢复。文件包含绑定凭证，请妥善保存。</string>
+    <string name="config_export_button">导出卡片配置</string>
+    <string name="config_import_button">导入卡片配置</string>
+    <string name="config_exported">卡片配置已导出</string>
+    <string name="config_export_failed">导出失败：%1$s</string>
+    <string name="config_file_unavailable">无法读取或写入所选文件</string>
+    <string name="config_empty">配置文件中没有卡片</string>
+    <string name="config_import_title">导入卡片配置</string>
+    <string name="config_import_message">配置文件包含 %1$d 张卡片。导入后保留已有卡片，重复卡片保留本机备注和缓存。</string>
+    <string name="config_imported">已导入 %1$d 张新卡片</string>
+    <string name="config_import_failed">导入失败，请选择有效的甘农卡配置文件</string>
+
     <!-- 保活前台服务通知 -->
     <string name="notif_channel_name">付款码保活</string>
     <string name="notif_channel_desc">后台刷新付款码，保证组件上的码有效</string>

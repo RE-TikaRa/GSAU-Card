@@ -11,11 +11,19 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.tika.paycard.R
+import com.tika.paycard.data.AccountBackup
+import com.tika.paycard.data.AccountStore
 import com.tika.paycard.databinding.ActivitySettingsBinding
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
 import com.tika.paycard.work.WidgetExpiry
+import java.io.IOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 设置页:保活档位选择 + 电池白名单跳转 + 各家 ROM 自启动引导。
@@ -26,6 +34,16 @@ class SettingsActivity : AppCompatActivity() {
 
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
+    private val exportDocument =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+            if (uri != null) exportConfig(uri)
+        }
+
+    private val importDocument =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) importConfig(uri)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +69,9 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         setupColorSwatches()
+
+        binding.btnExport.setOnClickListener { exportDocument.launch("GSAU-Card-config.json") }
+        binding.btnImport.setOnClickListener { importDocument.launch(arrayOf("application/json", "text/plain")) }
 
         when (KeepAlive.getMode(this)) {
             KeepAlive.Mode.LITE -> binding.radioLite.isChecked = true
@@ -92,6 +113,57 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.btnAbout.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
+        }
+    }
+
+    private fun exportConfig(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    val text = AccountStore.get(this@SettingsActivity).exportConfig()
+                    val output = contentResolver.openOutputStream(uri)
+                        ?: throw IOException(getString(R.string.config_file_unavailable))
+                    output.bufferedWriter(Charsets.UTF_8).use { it.write(text) }
+                }
+                AppDialog.notice(binding.root, getString(R.string.config_exported))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                val message = e.message ?: getString(R.string.config_file_unavailable)
+                AppDialog.notice(binding.root, getString(R.string.config_export_failed, message))
+            }
+        }
+    }
+
+    private fun importConfig(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                val config = withContext(Dispatchers.IO) {
+                    val input = contentResolver.openInputStream(uri)
+                        ?: throw IOException(getString(R.string.config_file_unavailable))
+                    input.bufferedReader(Charsets.UTF_8).use { AccountBackup.decode(it.readText()) }
+                }
+                if (config.accounts.isEmpty()) {
+                    AppDialog.notice(binding.root, getString(R.string.config_empty))
+                    return@launch
+                }
+                AppDialog.confirm(
+                    context = this@SettingsActivity,
+                    title = getString(R.string.config_import_title),
+                    message = getString(R.string.config_import_message, config.accounts.size),
+                    positiveText = getString(R.string.config_import_button),
+                    onPositive = {
+                        val added = AccountStore.get(this@SettingsActivity).importConfig(config)
+                        KeepAlive.apply(this@SettingsActivity)
+                        PayWidgetProvider.refreshAll(this@SettingsActivity)
+                        AppDialog.notice(binding.root, getString(R.string.config_imported, added))
+                    }
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                AppDialog.notice(binding.root, getString(R.string.config_import_failed))
+            }
         }
     }
 

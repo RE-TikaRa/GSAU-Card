@@ -54,6 +54,36 @@ class AccountStore internal constructor(context: Context) {
         save(all)
     }
 
+    fun exportConfig(): String = synchronized(lock) {
+        val all = list()
+        AccountBackup.encode(all, clampIndex(prefs.getInt(KEY_CURRENT, 0), all.size))
+    }
+
+    /** 合并配置时保留已有卡片的备注和最新缓存,重复导入不新增记录。 */
+    fun importConfig(config: AccountBackup.Config): Int = synchronized(lock) {
+        val all = list()
+        val wasEmpty = all.isEmpty()
+        var added = 0
+        config.accounts.forEach { account ->
+            if (all.none { it.sameCard(account) }) {
+                all.add(account.copy(cachedCode = "", cachedAt = 0L, balance = ""))
+                added++
+            }
+        }
+        if (added > 0) {
+            val arr = JSONArray()
+            all.forEach { arr.put(it.toJson()) }
+            val editor = prefs.edit().putString(KEY_ACCOUNTS, arr.toString())
+            if (wasEmpty) {
+                config.accounts.getOrNull(config.currentIndex)?.let { current ->
+                    editor.putInt(KEY_CURRENT, all.indexOfFirst { it.sameCard(current) })
+                }
+            }
+            editor.apply()
+        }
+        added
+    }
+
     fun removeAt(i: Int) = synchronized(lock) {
         val all = list()
         if (i !in all.indices) return@synchronized
