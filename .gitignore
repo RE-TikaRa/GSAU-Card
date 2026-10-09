@@ -31,3 +31,6 @@ Thumbs.db
 
 # 日志
 *.log
+
+# 其他
+.serena/
