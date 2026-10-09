@@ -29,6 +29,7 @@ class PayActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPayBinding
     private var loopJob: Job? = null
     private var expiryJob: Job? = null
+    private var shareJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,14 @@ class PayActivity : AppCompatActivity() {
         }
         binding.payQr.setOnClickListener { lifecycleScope.launch { refresh() } }
         binding.payRefresh.setOnClickListener { lifecycleScope.launch { refresh() } }
+        binding.payQr.setOnLongClickListener {
+            if (binding.payQr.drawable != null && shareJob?.isActive != true) {
+                shareJob = lifecycleScope.launch {
+                    QrShare.share(this@PayActivity, binding.root) { showCached() }
+                }
+            }
+            true
+        }
     }
 
     override fun onResume() {
@@ -64,6 +73,7 @@ class PayActivity : AppCompatActivity() {
     override fun onPause() {
         loopJob?.cancel()
         expiryJob?.cancel()
+        shareJob?.cancel()
         KeepAlive.leaveForeground(this)
         super.onPause()
     }

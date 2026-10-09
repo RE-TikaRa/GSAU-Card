@@ -21,11 +21,12 @@ object QrGenerator {
         content: String,
         size: Int,
         foreground: Int = Color.BLACK,
-        background: Int = Color.TRANSPARENT
+        background: Int = Color.TRANSPARENT,
+        margin: Int = 1
     ): Bitmap {
         val hints = mapOf(
             EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
-            EncodeHintType.MARGIN to 1,
+            EncodeHintType.MARGIN to margin,
             EncodeHintType.CHARACTER_SET to "UTF-8"
         )
         val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, size, size, hints)

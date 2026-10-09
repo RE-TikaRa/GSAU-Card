@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appliedScheme: ColorManager.Scheme
     private var loopJob: Job? = null
     private var expiryJob: Job? = null
+    private var shareJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +61,17 @@ class MainActivity : AppCompatActivity() {
         binding.cardQr.setOnClickListener {
             startActivity(Intent(this, PayActivity::class.java))
         }
+        binding.cardQr.setOnLongClickListener {
+            if (binding.cardQr.drawable != null && shareJob?.isActive != true) {
+                shareJob = lifecycleScope.launch {
+                    QrShare.share(this@MainActivity, binding.root) {
+                        renderCurrent()
+                        adapter.submit(store.list(), store.currentIndex())
+                    }
+                }
+            }
+            true
+        }
     }
 
     private fun maybeShowGuide() {
@@ -84,6 +96,7 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         loopJob?.cancel()
         expiryJob?.cancel()
+        shareJob?.cancel()
         KeepAlive.leaveForeground(this)
         super.onPause()
     }
@@ -242,6 +255,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun selectAccount(index: Int) {
+        shareJob?.cancel()
         store.setCurrentIndex(index)
         renderCurrent()
         startLoop()
