@@ -57,14 +57,32 @@ object UpdateChecker {
     /** 把 github.com 原始链接换成走 Cloudflare 的镜像域名,下载与页面都经代理。 */
     private fun proxied(url: String) = url.replaceFirst("^https://github\\.com".toRegex(), PROXY)
 
-    /** 按点分段逐段比较数字,a>b 返回正数,相等返回 0。 */
+    /** 数字版本逐段比较,同版本正式版高于预发布版,预发布数字段按数值排序。 */
     private fun compareVersion(a: String, b: String): Int {
-        val pa = a.split(".")
-        val pb = b.split(".")
+        val va = a.split("-", limit = 2)
+        val vb = b.split("-", limit = 2)
+        val pa = va[0].split(".")
+        val pb = vb[0].split(".")
         for (i in 0 until maxOf(pa.size, pb.size)) {
             val na = pa.getOrNull(i)?.toIntOrNull() ?: 0
             val nb = pb.getOrNull(i)?.toIntOrNull() ?: 0
             if (na != nb) return na - nb
+        }
+        if (va.size != vb.size) return if (va.size == 1) 1 else -1
+        val sa = va.getOrNull(1).orEmpty().split(".")
+        val sb = vb.getOrNull(1).orEmpty().split(".")
+        for (i in 0 until maxOf(sa.size, sb.size)) {
+            val partA = sa.getOrNull(i) ?: return -1
+            val partB = sb.getOrNull(i) ?: return 1
+            val na = partA.toIntOrNull()
+            val nb = partB.toIntOrNull()
+            val result = when {
+                na != null && nb != null -> na.compareTo(nb)
+                na != null -> -1
+                nb != null -> 1
+                else -> partA.compareTo(partB)
+            }
+            if (result != 0) return result
         }
         return 0
     }

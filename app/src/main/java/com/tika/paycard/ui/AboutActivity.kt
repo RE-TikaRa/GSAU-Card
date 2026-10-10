@@ -71,7 +71,7 @@ class AboutActivity : AppCompatActivity() {
                     title = getString(R.string.about_new_version_title, result.version),
                     message = getString(R.string.about_new_version_message),
                     positiveText = getString(R.string.about_go_download),
-                    onPositive = { openUri(result.pageUrl.ifBlank { result.apkUrl }) }
+                    onPositive = { openUri(result.apkUrl) }
                 )
                 is UpdateChecker.Result.UpToDate ->
                     AppDialog.notice(binding.root, getString(R.string.about_up_to_date))

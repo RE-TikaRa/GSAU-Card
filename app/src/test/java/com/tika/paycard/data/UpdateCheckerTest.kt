@@ -27,7 +27,7 @@ class UpdateCheckerTest {
         assertTrue(r is UpdateChecker.Result.NewVersion)
         r as UpdateChecker.Result.NewVersion
         assertEquals("1.2", r.version)
-        assertTrue(r.apkUrl.endsWith("/RE-TikaRa/GSAU-Card/releases/download/v1.2/GSAU-Card-v1.2.apk"))
+        assertEquals("https://gh.re-tikara.fun/RE-TikaRa/GSAU-Card/releases/download/v1.2/GSAU-Card-v1.2.apk", r.apkUrl)
         assertTrue(r.pageUrl.endsWith("/RE-TikaRa/GSAU-Card/releases/tag/v1.2"))
         assertTrue(r.apkUrl.startsWith("https://"))
     }
@@ -46,6 +46,44 @@ class UpdateCheckerTest {
     fun `多段版本号逐段比较`() {
         assertTrue(UpdateChecker.parse(json(tag = "v1.2.1"), "1.2") is UpdateChecker.Result.NewVersion)
         assertTrue(UpdateChecker.parse(json(tag = "v1.2"), "1.2.1") is UpdateChecker.Result.UpToDate)
+    }
+
+    @Test
+    fun `Debug 补丁版本递增时提示更新`() {
+        val r = UpdateChecker.parse(json(tag = "v2.3.2-debug"), "2.3.1-debug")
+        assertTrue(r is UpdateChecker.Result.NewVersion)
+        assertEquals("2.3.2-debug", (r as UpdateChecker.Result.NewVersion).version)
+    }
+
+    @Test
+    fun `相同或较旧 Debug 版本不提示更新`() {
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug"), "2.3.1-debug") is UpdateChecker.Result.UpToDate)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3-debug"), "2.3.1-debug") is UpdateChecker.Result.UpToDate)
+    }
+
+    @Test
+    fun `同版本正式版高于 Debug 版`() {
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1"), "2.3.1-debug") is UpdateChecker.Result.NewVersion)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug"), "2.3.1") is UpdateChecker.Result.UpToDate)
+    }
+
+    @Test
+    fun `Debug 与正式版优先比较数字版本`() {
+        assertTrue(UpdateChecker.parse(json(tag = "v2.4-debug"), "2.3.1") is UpdateChecker.Result.NewVersion)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3"), "2.3.1-debug") is UpdateChecker.Result.UpToDate)
+    }
+
+    @Test
+    fun `预发布数字后缀按数值排序`() {
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug.10"), "2.3.1-debug.2") is UpdateChecker.Result.NewVersion)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug.2"), "2.3.1-debug.10") is UpdateChecker.Result.UpToDate)
+    }
+
+    @Test
+    fun `预发布标识逐段比较数字和文本`() {
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug.beta"), "2.3.1-debug.1") is UpdateChecker.Result.NewVersion)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug.1"), "2.3.1-debug.beta") is UpdateChecker.Result.UpToDate)
+        assertTrue(UpdateChecker.parse(json(tag = "v2.3.1-debug.1.1"), "2.3.1-debug.1") is UpdateChecker.Result.NewVersion)
     }
 
     @Test
