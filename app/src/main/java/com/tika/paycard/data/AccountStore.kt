@@ -12,30 +12,34 @@ class AccountStore internal constructor(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val lock = Any()
 
-    fun list(): MutableList<Account> {
-        val raw = prefs.getString(KEY_ACCOUNTS, null) ?: return mutableListOf()
-        val arr = runCatching { JSONArray(raw) }.getOrNull() ?: return mutableListOf()
-        return (0 until arr.length())
+    fun list(): MutableList<Account> = synchronized(lock) {
+        val raw = prefs.getString(KEY_ACCOUNTS, null) ?: return@synchronized mutableListOf()
+        val arr = runCatching { JSONArray(raw) }.getOrNull() ?: return@synchronized mutableListOf()
+        (0 until arr.length())
             .mapNotNull { arr.optJSONObject(it)?.let(Account::fromJson) }
             .toMutableList()
     }
 
-    fun save(accounts: List<Account>) {
+    fun save(accounts: List<Account>, currentIndex: Int? = null) = synchronized(lock) {
         val arr = JSONArray()
         accounts.forEach { arr.put(it.toJson()) }
-        prefs.edit().putString(KEY_ACCOUNTS, arr.toString()).apply()
+        val editor = prefs.edit().putString(KEY_ACCOUNTS, arr.toString())
+        if (currentIndex != null) editor.putInt(KEY_CURRENT, currentIndex)
+        editor.apply()
     }
 
-    fun currentIndex(): Int = clampIndex(prefs.getInt(KEY_CURRENT, 0), list().size)
+    fun currentIndex(): Int = synchronized(lock) {
+        clampIndex(prefs.getInt(KEY_CURRENT, 0), list().size)
+    }
 
-    fun setCurrentIndex(i: Int) {
+    fun setCurrentIndex(i: Int) = synchronized(lock) {
         prefs.edit().putInt(KEY_CURRENT, i).apply()
     }
 
-    fun current(): Account? {
+    fun current(): Account? = synchronized(lock) {
         val all = list()
-        val i = currentIndex()
-        return all.getOrNull(i)
+        val i = clampIndex(prefs.getInt(KEY_CURRENT, 0), all.size)
+        all.getOrNull(i)
     }
 
     /** 切到下一个账号,返回切换后的账号。组件点姓名条时用。 */
@@ -88,8 +92,7 @@ class AccountStore internal constructor(context: Context) {
         val all = list()
         if (i !in all.indices) return@synchronized
         all.removeAt(i)
-        save(all)
-        setCurrentIndex(indexAfterRemoval(prefs.getInt(KEY_CURRENT, 0), i, all.size))
+        save(all, indexAfterRemoval(prefs.getInt(KEY_CURRENT, 0), i, all.size))
     }
 
     /** 就地替换某张卡,保持它在列表中的位置。凭证失效后重新绑定用。 */

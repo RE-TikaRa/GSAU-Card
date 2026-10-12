@@ -1,6 +1,9 @@
 package com.tika.paycard.data
 
 import org.json.JSONObject
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
@@ -82,6 +85,59 @@ class AccountStoreTest {
         store.replace(original, rebound)
 
         assertEquals(rebound.copy(alias = "饭卡"), store.current())
+    }
+
+    @Test
+    fun `删除前面的卡片时偏好监听和后台读取保持当前卡片`() {
+        val first = Account("first", "9")
+        val selected = Account("second", "9")
+        val last = Account("third", "9")
+        store.add(first)
+        store.add(selected)
+        store.add(last)
+        store.setCurrentIndex(1)
+        val prefs = RuntimeEnvironment.getApplication().getSharedPreferences("paycard_store", 0)
+        val observed = mutableListOf<Account?>()
+        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            observed.add(store.current())
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        try {
+            store.removeAt(0)
+            assertEquals(selected, store.current())
+            org.junit.Assert.assertTrue(observed.isNotEmpty())
+            org.junit.Assert.assertTrue(observed.all { it == selected })
+        } finally {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    @Test
+    fun `后台读取与删除同时执行不会切换到其他卡片`() {
+        val selected = Account("selected", "9")
+        val start = CountDownLatch(1)
+        val executor = Executors.newFixedThreadPool(2)
+        store.add(selected)
+        store.add(Account("last", "9"))
+        try {
+            val reader = executor.submit<Boolean> {
+                start.await()
+                (1..2000).all { store.current()?.sameCard(selected) == true }
+            }
+            val writer = executor.submit {
+                start.await()
+                repeat(200) {
+                    val prefix = Account("prefix", "9")
+                    store.save(listOf(prefix, selected, Account("last", "9")), 1)
+                    store.removeAt(0)
+                }
+            }
+            start.countDown()
+            writer.get(10, TimeUnit.SECONDS)
+            org.junit.Assert.assertTrue(reader.get(10, TimeUnit.SECONDS))
+        } finally {
+            executor.shutdownNow()
+        }
     }
 
     @Test
