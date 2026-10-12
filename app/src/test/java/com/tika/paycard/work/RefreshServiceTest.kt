@@ -8,6 +8,7 @@ import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
+import com.tika.paycard.data.UserConsent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -26,6 +27,7 @@ class RefreshServiceTest {
     @Before
     fun setup() {
         val context = RuntimeEnvironment.getApplication()
+        UserConsent.accept(context)
         WorkManagerTestInitHelper.initializeTestWorkManager(context,
             Configuration.Builder().setExecutor(SynchronousExecutor()).build())
         AccountStore.get(context).add(Account("first", "9"))

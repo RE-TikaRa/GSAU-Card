@@ -11,6 +11,7 @@ import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodePolicy
 import com.tika.paycard.data.PayCodeRepository
+import com.tika.paycard.data.UserConsent
 import com.tika.paycard.databinding.ActivityPayBinding
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
@@ -36,6 +37,11 @@ class PayActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!UserConsent.hasAccepted(this)) {
+            startActivity(Intent(this, AgreementActivity::class.java))
+            finish()
+            return
+        }
         ColorManager.applyOverlay(this)
         binding = ActivityPayBinding.inflate(layoutInflater)
         setContentView(binding.root)

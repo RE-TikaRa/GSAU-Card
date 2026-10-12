@@ -15,6 +15,7 @@ import com.tika.paycard.R
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodePolicy
 import com.tika.paycard.data.AccountStore
+import com.tika.paycard.data.UserConsent
 import com.tika.paycard.widget.PayWidgetProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,10 +37,18 @@ class RefreshService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        if (!UserConsent.hasAccepted(this)) {
+            stopSelf()
+            return
+        }
         startForeground(NOTIF_ID, buildNotification())
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (!UserConsent.hasAccepted(this)) {
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
         if (loopJob?.isActive != true) {
             loopJob = scope.launch {
                 while (isActive) {
@@ -97,6 +106,7 @@ class RefreshService : Service() {
         private const val CHANNEL_ID = "paycode_keepalive"
         private const val NOTIF_ID = 1001
         fun start(context: Context): Boolean {
+            if (!UserConsent.hasAccepted(context)) return false
             val intent = Intent(context, RefreshService::class.java)
             return runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

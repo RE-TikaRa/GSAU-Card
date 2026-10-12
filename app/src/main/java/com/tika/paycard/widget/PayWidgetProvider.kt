@@ -15,6 +15,8 @@ import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodePolicy
+import com.tika.paycard.data.UserConsent
+import com.tika.paycard.ui.AgreementActivity
 import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.work.KeepAlive
 import com.tika.paycard.work.WidgetExpiry
@@ -51,6 +53,10 @@ class PayWidgetProvider : AppWidgetProvider() {
             AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> renderAll(context)
             ACTION_RENDER -> renderAll(context, intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS))
             ACTION_SWITCH -> {
+                if (!UserConsent.hasAccepted(context)) {
+                    renderAll(context)
+                    return
+                }
                 KeepAlive.apply(context)
                 AccountStore.get(context).switchToNext()
                 renderAll(context)
@@ -59,6 +65,10 @@ class PayWidgetProvider : AppWidgetProvider() {
                 }
             }
             ACTION_REFRESH -> {
+                if (!UserConsent.hasAccepted(context)) {
+                    renderAll(context)
+                    return
+                }
                 KeepAlive.apply(context)
                 fetchAndRender(context)
             }
@@ -72,6 +82,10 @@ class PayWidgetProvider : AppWidgetProvider() {
         ids: IntArray = widgetIds(context, manager)
     ) {
         if (ids.isEmpty()) return
+        if (!UserConsent.hasAccepted(context)) {
+            renderAll(context, ids, manager)
+            return
+        }
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -94,6 +108,20 @@ class PayWidgetProvider : AppWidgetProvider() {
         val scheme = ColorManager.getScheme(context)
         views.setInt(R.id.widget_name_bar, "setBackgroundResource", scheme.widgetName)
         views.setInt(R.id.widget_refresh, "setBackgroundResource", scheme.widgetRefresh)
+        if (!UserConsent.hasAccepted(context)) {
+            WidgetExpiry.cancel(context)
+            views.setTextViewText(R.id.widget_name, context.getString(R.string.app_name))
+            views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
+            views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
+            views.setTextViewText(R.id.widget_hint, context.getString(R.string.widget_agreement_required))
+            val agreement = agreementIntent(context)
+            views.setOnClickPendingIntent(R.id.widget_root, agreement)
+            views.setOnClickPendingIntent(R.id.widget_hint, agreement)
+            views.setOnClickPendingIntent(R.id.widget_refresh, agreement)
+            runCatching { manager.updateAppWidget(targets, views) }
+                .onFailure { Log.w(TAG, "updateAppWidget 失败,组件本轮未刷新", it) }
+            return
+        }
         val account = AccountStore.get(context).current()
 
         if (account == null) {
@@ -139,8 +167,14 @@ class PayWidgetProvider : AppWidgetProvider() {
 
     private fun openAppIntent(context: Context): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            ?: Intent(context, PayActivity::class.java)
+            ?: Intent(context, AgreementActivity::class.java)
         return PendingIntent.getActivity(context, 0, intent, flags())
+    }
+
+    private fun agreementIntent(context: Context): PendingIntent {
+        val intent = Intent(context, AgreementActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        return PendingIntent.getActivity(context, 5, intent, flags())
     }
 
     private fun openPayIntent(context: Context): PendingIntent {

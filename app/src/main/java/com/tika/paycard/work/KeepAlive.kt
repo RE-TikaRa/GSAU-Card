@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import com.tika.paycard.data.AccountStore
+import com.tika.paycard.data.UserConsent
 
 /**
  * 保活档位与系统设置跳转。
@@ -34,6 +35,11 @@ object KeepAlive {
 
     /** 按当前档位启动对应保活机制 */
     fun apply(context: Context, mode: Mode = getMode(context)): Boolean {
+        if (!UserConsent.hasAccepted(context)) {
+            RefreshWorker.cancel(context)
+            RefreshService.stop(context)
+            return false
+        }
         RefreshWorker.schedule(context)
         return when (mode) {
             Mode.LITE -> {

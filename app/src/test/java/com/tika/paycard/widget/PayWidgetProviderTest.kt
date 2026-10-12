@@ -16,6 +16,8 @@ import com.tika.paycard.R
 import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodePolicy
+import com.tika.paycard.data.UserConsent
+import com.tika.paycard.ui.AgreementActivity
 import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.work.WidgetExpiry
 import java.time.Duration
@@ -41,6 +43,7 @@ class PayWidgetProviderTest {
     @Before
     fun setup() {
         context = RuntimeEnvironment.getApplication()
+        UserConsent.accept(context)
         WorkManagerTestInitHelper.initializeTestWorkManager(
             context,
             Configuration.Builder().setExecutor(SynchronousExecutor()).build()
@@ -55,6 +58,22 @@ class PayWidgetProviderTest {
             cachedAt = System.currentTimeMillis()
         )
         store.add(account)
+    }
+
+    @Test
+    fun `未同意协议时组件隐藏付款码并打开协议页`() {
+        context.getSharedPreferences("user_consent", Context.MODE_PRIVATE).edit().clear().commit()
+        ShadowAlarmManager.setCanScheduleExactAlarms(true)
+        val widgets = shadowOf(AppWidgetManager.getInstance(context))
+        val id = widgets.createWidget(PayWidgetProvider::class.java, R.layout.widget_paycard)
+        val view = widgets.getViewFor(id)
+
+        assertEquals(View.GONE, view.findViewById<View>(R.id.widget_qr).visibility)
+        assertEquals(context.getString(R.string.widget_agreement_required),
+            view.findViewById<TextView>(R.id.widget_hint).text)
+        view.findViewById<View>(R.id.widget_hint).performClick()
+        assertEquals(AgreementActivity::class.java.name,
+            shadowOf(RuntimeEnvironment.getApplication()).nextStartedActivity.component?.className)
     }
 
     @Test

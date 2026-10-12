@@ -28,6 +28,9 @@ object PayCodeManager {
     private val entries = ConcurrentHashMap<CardKey, Entry>()
 
     suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
+        if (!UserConsent.hasAccepted(context)) {
+            return PayCodeRepository.Result.Error("请先阅读并同意隐私政策和用户协议")
+        }
         val key = CardKey(account.openid, account.cardId)
         val invokedAt = System.nanoTime()
         val entry = entries.compute(key) { _, current ->

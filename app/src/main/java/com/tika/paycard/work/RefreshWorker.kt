@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.PayCodeManager
 import com.tika.paycard.data.PayCodeRepository
+import com.tika.paycard.data.UserConsent
 import com.tika.paycard.widget.PayWidgetProvider
 import java.util.concurrent.TimeUnit
 
@@ -21,6 +22,11 @@ import java.util.concurrent.TimeUnit
 class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
+        if (!UserConsent.hasAccepted(applicationContext)) {
+            cancel(applicationContext)
+            PayWidgetProvider.refreshAll(applicationContext)
+            return Result.success()
+        }
         val account = AccountStore.get(applicationContext).current()
         if (account == null) {
             cancel(applicationContext)
@@ -40,7 +46,7 @@ class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         private const val WORK_NAME = "paycode_refresh"
 
         fun schedule(context: Context) {
-            if (AccountStore.get(context).current() == null) {
+            if (!UserConsent.hasAccepted(context) || AccountStore.get(context).current() == null) {
                 cancel(context)
                 return
             }

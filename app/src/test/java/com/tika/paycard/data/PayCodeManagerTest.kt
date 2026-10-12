@@ -41,6 +41,7 @@ class PayCodeManagerTest {
     @Before
     fun setup() {
         context = RuntimeEnvironment.getApplication()
+        UserConsent.accept(context)
         repo = ReflectionHelpers.getStaticField(PayCodeManager::class.java, "repo")
         originalClient = ReflectionHelpers.getField(repo, "client")
         ReflectionHelpers.setField(repo, "client", Call.Factory { request ->
@@ -52,6 +53,17 @@ class PayCodeManagerTest {
     @After
     fun restoreClient() {
         ReflectionHelpers.setField(repo, "client", originalClient)
+    }
+
+    @Test
+    fun `未同意协议时不请求付款码`() = runBlocking {
+        context.getSharedPreferences("user_consent", Context.MODE_PRIVATE).edit().clear().commit()
+
+        assertEquals(
+            PayCodeRepository.Result.Error("请先阅读并同意隐私政策和用户协议"),
+            PayCodeManager.refresh(context, account)
+        )
+        assertTrue(calls.tryReceive().isFailure)
     }
 
     @Test

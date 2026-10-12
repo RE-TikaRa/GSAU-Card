@@ -9,6 +9,7 @@ import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.tika.paycard.data.Account
 import com.tika.paycard.data.AccountStore
+import com.tika.paycard.data.UserConsent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -29,11 +30,22 @@ class RefreshWorkerTest {
     @Before
     fun setup() {
         context = RuntimeEnvironment.getApplication()
+        UserConsent.accept(context)
         WorkManagerTestInitHelper.initializeTestWorkManager(context,
             Configuration.Builder().setExecutor(SynchronousExecutor()).build())
         manager = WorkManager.getInstance(context)
         store = AccountStore.get(context)
         store.save(emptyList())
+    }
+
+    @Test
+    fun `协议未确认时不安排周期任务`() {
+        store.add(Account("first", "9"))
+        context.getSharedPreferences("user_consent", Context.MODE_PRIVATE).edit().clear().commit()
+
+        RefreshWorker.schedule(context)
+
+        assertTrue(work().isEmpty())
     }
 
     @Test
