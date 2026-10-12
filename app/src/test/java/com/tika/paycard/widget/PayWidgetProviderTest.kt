@@ -4,9 +4,11 @@ import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Looper
 import android.view.View
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.work.Configuration
 import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
@@ -18,6 +20,7 @@ import com.tika.paycard.ui.PayActivity
 import com.tika.paycard.work.WidgetExpiry
 import java.time.Duration
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -98,6 +101,29 @@ class PayWidgetProviderTest {
 
         assertEquals(View.VISIBLE, widgets.getViewFor(id).findViewById<View>(R.id.widget_qr).visibility)
         assertEquals(1, shadowOf(context.getSystemService(AlarmManager::class.java)).scheduledAlarms.size)
+    }
+
+    @Test
+    fun `多个组件共用二维码位图和同一个到期闹钟`() {
+        ShadowAlarmManager.setCanScheduleExactAlarms(true)
+        val widgets = shadowOf(AppWidgetManager.getInstance(context))
+        val first = widgets.createWidget(PayWidgetProvider::class.java, R.layout.widget_paycard)
+        val second = widgets.createWidget(PayWidgetProvider::class.java, R.layout.widget_paycard)
+
+        PayWidgetProvider().onReceive(context, Intent(WidgetExpiry.ACTION))
+
+        val firstBitmap = (widgets.getViewFor(first).findViewById<ImageView>(R.id.widget_qr).drawable as BitmapDrawable).bitmap
+        val secondBitmap = (widgets.getViewFor(second).findViewById<ImageView>(R.id.widget_qr).drawable as BitmapDrawable).bitmap
+        assertSame(firstBitmap, secondBitmap)
+        assertEquals(1, shadowOf(context.getSystemService(AlarmManager::class.java)).scheduledAlarms.size)
+
+        AccountStore.get(context).update(account.copy(cachedAt = System.currentTimeMillis() - PayCodePolicy.VALIDITY_MS))
+        PayWidgetProvider().onReceive(context, Intent(WidgetExpiry.ACTION))
+
+        listOf(first, second).forEach { id ->
+            assertEquals(View.GONE, widgets.getViewFor(id).findViewById<View>(R.id.widget_qr).visibility)
+        }
+        assertTrue(shadowOf(context.getSystemService(AlarmManager::class.java)).scheduledAlarms.isEmpty())
     }
 
     @Test

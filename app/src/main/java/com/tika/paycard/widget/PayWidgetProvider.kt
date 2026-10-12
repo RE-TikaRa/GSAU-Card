@@ -34,7 +34,7 @@ class PayWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        ids.forEach { renderWidget(context, manager, it) }
+        renderAll(context, ids, manager)
         if (KeepAlive.getMode(context) == KeepAlive.Mode.STEADY) {
             fetchAndRender(context, manager, ids)
         }
@@ -83,12 +83,13 @@ class PayWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun renderAll(context: Context, ids: IntArray? = null) {
-        val manager = AppWidgetManager.getInstance(context)
-        (ids ?: widgetIds(context, manager)).forEach { renderWidget(context, manager, it) }
-    }
-
-    private fun renderWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
+    private fun renderAll(
+        context: Context,
+        ids: IntArray? = null,
+        manager: AppWidgetManager = AppWidgetManager.getInstance(context)
+    ) {
+        val targets = ids ?: widgetIds(context, manager)
+        if (targets.isEmpty()) return
         val views = RemoteViews(context.packageName, R.layout.widget_paycard)
         val scheme = ColorManager.getScheme(context)
         views.setInt(R.id.widget_name_bar, "setBackgroundResource", scheme.widgetName)
@@ -96,6 +97,7 @@ class PayWidgetProvider : AppWidgetProvider() {
         val account = AccountStore.get(context).current()
 
         if (account == null) {
+            WidgetExpiry.cancel(context)
             views.setTextViewText(R.id.widget_name, context.getString(R.string.widget_add_card))
             views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
             views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
@@ -111,6 +113,7 @@ class PayWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.widget_hint, android.view.View.GONE)
                 WidgetExpiry.schedule(context, account.cachedAt + PayCodePolicy.VALIDITY_MS)
             } else {
+                WidgetExpiry.cancel(context)
                 views.setViewVisibility(R.id.widget_qr, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_hint, android.view.View.VISIBLE)
                 views.setTextViewText(
@@ -130,7 +133,7 @@ class PayWidgetProvider : AppWidgetProvider() {
             )
         }
         // RemoteViews 经 Binder 传桌面进程,事务超限等异常会让这次更新无声丢失,记下来便于定位
-        runCatching { manager.updateAppWidget(widgetId, views) }
+        runCatching { manager.updateAppWidget(targets, views) }
             .onFailure { Log.w(TAG, "updateAppWidget 失败,组件本轮未刷新", it) }
     }
 
