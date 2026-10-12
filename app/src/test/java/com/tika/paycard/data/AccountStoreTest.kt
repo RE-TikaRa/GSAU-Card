@@ -85,6 +85,31 @@ class AccountStoreTest {
     }
 
     @Test
+    fun `重绑到已有卡片不会创建重复记录或覆盖备注`() {
+        val original = Account("first", "9", alias = "原卡片")
+        val existing = Account("second", "9", alias = "已有卡片")
+        store.add(original)
+        store.add(existing)
+
+        assertThrows(IllegalArgumentException::class.java) { store.replace(original, existing.copy()) }
+
+        assertEquals(listOf(original, existing), store.list())
+        assertEquals(store.list(), AccountBackup.decode(store.exportConfig()).accounts)
+    }
+
+    @Test
+    fun `同身份重新绑定和同用户另一张卡均允许替换`() {
+        val original = Account("first", "9", alias = "饭卡")
+        store.add(original)
+        store.add(Account("second", "10"))
+
+        assertEquals(0, store.replace(original, original.copy(name = "姓名")))
+        assertEquals(0, store.replace(original, Account("second", "9")))
+        assertEquals(listOf("9", "10"), store.list().map { it.cardId })
+        assertEquals("饭卡", store.current()?.alias)
+    }
+
+    @Test
     fun `导入多卡配置保留本机备注缓存和当前选择`() {
         val existing = Account("first", "9", alias = "本机备注", balance = "20", cachedCode = "new", cachedAt = 2L)
         val selected = Account("second", "9")

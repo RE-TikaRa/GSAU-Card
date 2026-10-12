@@ -18,6 +18,7 @@
     <string name="rebind_action">重新绑定</string>
     <string name="rebind_success">已重新绑定 %1$s</string>
     <string name="rebind_still_invalid">链接仍然取不到付款码，请确认是最新的链接</string>
+    <string name="rebind_duplicate">该卡片已添加，请在卡片列表中切换。原卡片未修改。</string>
     <string name="main_fetch_failed">获取失败：%1$s</string>
     <string name="cd_add">添加</string>
     <string name="cd_settings">设置</string>

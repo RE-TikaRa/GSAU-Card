@@ -97,6 +97,9 @@ class AccountStore internal constructor(context: Context) {
         val all = list()
         val i = all.indexOfFirst { it.sameCard(original) }
         if (i < 0) return@synchronized null
+        require(all.withIndex().none { (index, stored) -> index != i && stored.sameCard(account) }) {
+            "该卡片已添加"
+        }
         account.alias = all[i].alias
         all[i] = account
         save(all)

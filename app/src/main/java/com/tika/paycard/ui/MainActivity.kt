@@ -239,7 +239,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             when (val r = PayCodeManager.refresh(this@MainActivity, account)) {
                 is PayCodeRepository.Result.Ok -> {
-                    val index = store.replace(original, account) ?: return@launch
+                    val index = try {
+                        store.replace(original, account) ?: return@launch
+                    } catch (e: IllegalArgumentException) {
+                        AppDialog.notice(binding.root, getString(R.string.rebind_duplicate))
+                        return@launch
+                    }
                     store.setCurrentIndex(index)
                     renderCurrent()
                     adapter.submit(store.list(), store.currentIndex())
