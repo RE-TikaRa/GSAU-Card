@@ -26,19 +26,23 @@ object KeepAlive {
         return runCatching { Mode.valueOf(v!!) }.getOrDefault(Mode.LITE)
     }
 
-    fun setMode(context: Context, mode: Mode) {
+    fun setMode(context: Context, mode: Mode): Boolean {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .edit().putString(KEY_MODE, mode.name).apply()
-        apply(context, mode)
+        return apply(context, mode)
     }
 
     /** 按当前档位启动对应保活机制 */
-    fun apply(context: Context, mode: Mode = getMode(context)) {
+    fun apply(context: Context, mode: Mode = getMode(context)): Boolean {
         RefreshWorker.schedule(context)
-        when (mode) {
-            Mode.LITE -> RefreshService.stop(context)
+        return when (mode) {
+            Mode.LITE -> {
+                RefreshService.stop(context)
+                true
+            }
             Mode.STEADY -> if (AccountStore.get(context).current() == null) {
                 RefreshService.stop(context)
+                false
             } else {
                 RefreshService.start(context)
             }

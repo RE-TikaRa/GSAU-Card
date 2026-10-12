@@ -101,7 +101,9 @@
     <string name="settings_alarm_off">开启闹钟和提醒权限后，组件可显示付款码并在到期时清除。未开启时，点击组件进入付款页。</string>
     <string name="settings_alarm_button">开启闹钟和提醒权限</string>
     <string name="settings_rom_hint">国产 ROM 的省电策略较强，建议同时开启电池白名单和自启动，后台刷新才稳。</string>
-    <string name="settings_mode_steady_tip">已开启前台服务保活（通知栏会有一条常驻通知）</string>
+    <string name="settings_mode_steady_tip">已选择稳妥档，退到后台后持续刷新付款码</string>
+    <string name="settings_steady_no_card">已选择稳妥档，添加卡片后启用后台刷新</string>
+    <string name="settings_steady_failed">系统未允许启动后台刷新服务，可重新打开应用后再试</string>
     <string name="settings_mode_lite_tip">已切到省心档（点组件刷新按钮获取付款码）</string>
 
     <!-- 卡片配置 -->
@@ -132,6 +134,7 @@
     <string name="about_checking">正在检查更新…</string>
     <string name="about_up_to_date">已是最新版本</string>
     <string name="about_check_failed">检查失败：%1$s</string>
+    <string name="about_open_failed">无法打开链接，请检查是否有可用的浏览器或邮件应用</string>
     <string name="about_new_version_title">发现新版本 %1$s</string>
     <string name="about_new_version_message">前往下载页更新，安装后覆盖当前版本即可。</string>
     <string name="about_go_download">去下载</string>

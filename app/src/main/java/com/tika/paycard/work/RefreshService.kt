@@ -96,16 +96,16 @@ class RefreshService : Service() {
         private const val TAG = "RefreshService"
         private const val CHANNEL_ID = "paycode_keepalive"
         private const val NOTIF_ID = 1001
-        fun start(context: Context) {
+        fun start(context: Context): Boolean {
             val intent = Intent(context, RefreshService::class.java)
-            // Android 12+ 后台启前台服务会抛 ForegroundServiceStartNotAllowedException,兜住等下次前台时机再起
-            runCatching {
+            return runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)
                 } else {
                     context.startService(intent)
                 }
-            }
+            }.onFailure { Log.w(TAG, "无法启动付款码前台服务", it) }
+                .isSuccess
         }
 
         fun stop(context: Context) {

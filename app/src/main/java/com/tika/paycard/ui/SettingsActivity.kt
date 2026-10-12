@@ -86,13 +86,15 @@ class SettingsActivity : AppCompatActivity() {
                 binding.radioSteady.id -> KeepAlive.Mode.STEADY
                 else -> KeepAlive.Mode.LITE
             }
-            KeepAlive.setMode(this, mode)
+            val started = KeepAlive.setMode(this, mode)
             PayWidgetProvider.refreshAll(this)
             if (mode == KeepAlive.Mode.STEADY) ensureNotificationPermission()
-            val tip = if (mode == KeepAlive.Mode.STEADY)
-                R.string.settings_mode_steady_tip
-            else
-                R.string.settings_mode_lite_tip
+            val tip = when {
+                mode == KeepAlive.Mode.LITE -> R.string.settings_mode_lite_tip
+                AccountStore.get(this).current() == null -> R.string.settings_steady_no_card
+                !started -> R.string.settings_steady_failed
+                else -> R.string.settings_mode_steady_tip
+            }
             AppDialog.notice(binding.root, getString(tip))
         }
 

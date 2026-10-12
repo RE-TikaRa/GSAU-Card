@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.tika.paycard.BuildConfig
@@ -84,6 +85,9 @@ class AboutActivity : AppCompatActivity() {
     private fun openUri(uri: String) {
         runCatching {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+        }.onFailure {
+            Log.w("AboutActivity", "无法打开外部链接", it)
+            AppDialog.notice(binding.root, getString(R.string.about_open_failed))
         }
     }
 
