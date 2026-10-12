@@ -67,9 +67,10 @@ class AccountStore internal constructor(context: Context) {
     fun importConfig(config: AccountBackup.Config): Int = synchronized(lock) {
         val all = list()
         val wasEmpty = all.isEmpty()
+        val identities = all.mapTo(mutableSetOf()) { it.openid to it.cardId }
         var added = 0
         config.accounts.forEach { account ->
-            if (all.none { it.sameCard(account) }) {
+            if (identities.add(account.openid to account.cardId)) {
                 all.add(account.copy(cachedCode = "", cachedAt = 0L, balance = ""))
                 added++
             }

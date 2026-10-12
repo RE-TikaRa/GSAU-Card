@@ -116,7 +116,8 @@
     <string name="config_import_title">导入卡片配置</string>
     <string name="config_import_message">配置文件包含 %1$d 张卡片。导入后保留已有卡片，重复卡片保留本机备注和缓存。</string>
     <string name="config_imported">已导入 %1$d 张新卡片</string>
-    <string name="config_import_failed">导入失败，请选择有效的甘农卡配置文件</string>
+    <string name="config_import_failed">导入失败：%1$s</string>
+    <string name="config_import_invalid">请选择有效的甘农卡配置文件</string>
 
     <!-- 保活前台服务通知 -->
     <string name="notif_channel_name">付款码保活</string>

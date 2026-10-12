@@ -141,7 +141,7 @@ class SettingsActivity : AppCompatActivity() {
                 val config = withContext(Dispatchers.IO) {
                     val input = contentResolver.openInputStream(uri)
                         ?: throw IOException(getString(R.string.config_file_unavailable))
-                    input.bufferedReader(Charsets.UTF_8).use { AccountBackup.decode(it.readText()) }
+                    input.use { AccountBackup.read(it) }
                 }
                 if (config.accounts.isEmpty()) {
                     AppDialog.notice(binding.root, getString(R.string.config_empty))
@@ -153,16 +153,28 @@ class SettingsActivity : AppCompatActivity() {
                     message = getString(R.string.config_import_message, config.accounts.size),
                     positiveText = getString(R.string.config_import_button),
                     onPositive = {
-                        val added = AccountStore.get(this@SettingsActivity).importConfig(config)
-                        KeepAlive.apply(this@SettingsActivity)
-                        PayWidgetProvider.refreshAll(this@SettingsActivity)
-                        AppDialog.notice(binding.root, getString(R.string.config_imported, added))
+                        lifecycleScope.launch {
+                            try {
+                                val added = withContext(Dispatchers.IO) {
+                                    AccountStore.get(this@SettingsActivity).importConfig(config)
+                                }
+                                KeepAlive.apply(this@SettingsActivity)
+                                PayWidgetProvider.refreshAll(this@SettingsActivity)
+                                AppDialog.notice(binding.root, getString(R.string.config_imported, added))
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                val message = e.message ?: getString(R.string.config_import_invalid)
+                                AppDialog.notice(binding.root, getString(R.string.config_import_failed, message))
+                            }
+                        }
                     }
                 )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                AppDialog.notice(binding.root, getString(R.string.config_import_failed))
+                val message = e.message ?: getString(R.string.config_import_invalid)
+                AppDialog.notice(binding.root, getString(R.string.config_import_failed, message))
             }
         }
     }

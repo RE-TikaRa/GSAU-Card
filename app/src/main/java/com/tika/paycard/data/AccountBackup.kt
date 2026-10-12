@@ -1,5 +1,6 @@
 package com.tika.paycard.data
 
+import java.io.InputStream
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.json.JSONArray
 import org.json.JSONObject
@@ -9,7 +10,11 @@ object AccountBackup {
 
     data class Config(val accounts: List<Account>, val currentIndex: Int)
 
+    const val MAX_BYTES = 1024 * 1024
+    const val MAX_ACCOUNTS = 1000
+
     fun encode(accounts: List<Account>, currentIndex: Int): String {
+        require(accounts.size <= MAX_ACCOUNTS) { "配置文件不能超过 $MAX_ACCOUNTS 张卡片" }
         val records = JSONArray()
         accounts.forEach { account ->
             val link = BASE.toHttpUrl().newBuilder()
@@ -29,15 +34,29 @@ object AccountBackup {
             put("version", 1)
             put("currentIndex", AccountStore.clampIndex(currentIndex, accounts.size))
             put("accounts", records)
-        }.toString(2)
+        }.toString(2).also(::checkSize)
+    }
+
+    fun read(input: InputStream): Config {
+        val output = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        while (true) {
+            val count = input.read(buffer, 0, minOf(buffer.size, MAX_BYTES + 1 - output.size()))
+            if (count < 0) break
+            require(output.size() + count <= MAX_BYTES) { "配置文件不能超过 1 MiB" }
+            output.write(buffer, 0, count)
+        }
+        return decode(output.toString(Charsets.UTF_8.name()))
     }
 
     fun decode(text: String): Config {
+        checkSize(text)
         val root = JSONObject(text.removePrefix("\uFEFF"))
         require(root.getString("format") == "gsau-card" && root.getInt("version") == 1) {
             "不支持的卡片配置格式"
         }
         val records = root.getJSONArray("accounts")
+        require(records.length() <= MAX_ACCOUNTS) { "配置文件不能超过 $MAX_ACCOUNTS 张卡片" }
         val accounts = (0 until records.length()).map { i ->
             val record = records.getJSONObject(i)
             val link = record.getString("link").toHttpUrl()
@@ -62,6 +81,12 @@ object AccountBackup {
             "配置中的当前卡片无效"
         }
         return Config(accounts, currentIndex)
+    }
+
+    private fun checkSize(text: String) {
+        require(text.length <= MAX_BYTES && text.toByteArray(Charsets.UTF_8).size <= MAX_BYTES) {
+            "配置文件不能超过 1 MiB"
+        }
     }
 
     private const val BASE = "https://yktapp.gsau.edu.cn/virtualcard/openVirtualcard"

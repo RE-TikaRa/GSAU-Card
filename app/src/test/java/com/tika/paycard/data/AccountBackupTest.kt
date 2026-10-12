@@ -1,5 +1,6 @@
 package com.tika.paycard.data
 
+import java.io.ByteArrayInputStream
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -39,6 +40,41 @@ class AccountBackupTest {
         val text = AccountBackup.encode(emptyList(), 0)
 
         assertEquals(AccountBackup.Config(emptyList(), -1), AccountBackup.decode("\uFEFF$text"))
+    }
+
+    @Test
+    fun `流式读取保留 UTF8 备注和 BOM`() {
+        val account = Account("first", "9", alias = "饭卡")
+        val text = "\uFEFF" + AccountBackup.encode(listOf(account), 0)
+
+        assertEquals(listOf(account), AccountBackup.read(ByteArrayInputStream(text.toByteArray())).accounts)
+    }
+
+    @Test
+    fun `超大文件最多读取限制加一字节后拒绝`() {
+        val input = ByteArrayInputStream(ByteArray(AccountBackup.MAX_BYTES + 8192) { 32 })
+
+        assertThrows(IllegalArgumentException::class.java) { AccountBackup.read(input) }
+        assertEquals(8191, input.available())
+    }
+
+    @Test
+    fun `文件大小按 UTF8 字节限制且边界文件可导入`() {
+        val text = AccountBackup.encode(listOf(Account("first", "9")), 0)
+        val padded = text.padEnd(AccountBackup.MAX_BYTES, ' ')
+        assertEquals(1, AccountBackup.read(ByteArrayInputStream(padded.toByteArray())).accounts.size)
+        assertThrows(IllegalArgumentException::class.java) { AccountBackup.decode("中".repeat(AccountBackup.MAX_BYTES / 2)) }
+    }
+
+    @Test
+    fun `超过记录上限的配置拒绝导入`() {
+        val accounts = (0..AccountBackup.MAX_ACCOUNTS).map { Account("card$it", "9") }
+        val records = JSONArray()
+        accounts.forEach { records.put(JSONObject().put("link", "https://yktapp.gsau.edu.cn/virtualcard/openVirtualcard?openid=${it.openid}&id=9")) }
+        val root = JSONObject(AccountBackup.encode(emptyList(), -1)).put("accounts", records).put("currentIndex", 0)
+
+        assertThrows(IllegalArgumentException::class.java) { AccountBackup.decode(root.toString()) }
+        assertThrows(IllegalArgumentException::class.java) { AccountBackup.encode(accounts, 0) }
     }
 
     @Test
