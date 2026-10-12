@@ -20,9 +20,11 @@ import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 主界面:展示当前卡(姓名条+大二维码),账号切换与管理,粘贴链接添加,设置入口。
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private var loopJob: Job? = null
     private var expiryJob: Job? = null
     private var shareJob: Job? = null
+    private var qrJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         loopJob?.cancel()
         expiryJob?.cancel()
         shareJob?.cancel()
+        qrJob?.cancel()
         KeepAlive.leaveForeground(this)
         super.onPause()
     }
@@ -117,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         clearHintAction()
         val account = store.current()
         if (account == null) {
+            qrJob?.cancel()
             expiryJob?.cancel()
             binding.cardName.text = getString(R.string.main_no_card)
             binding.cardBalance.visibility = View.GONE
@@ -127,12 +132,24 @@ class MainActivity : AppCompatActivity() {
         binding.cardName.text = account.displayName()
         showBalance(account.balance)
         if (account.hasFreshCode()) {
-            binding.cardQr.setImageBitmap(
-                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_CARD)
-            )
+            qrJob?.cancel()
+            val code = account.cachedCode
+            val cachedAt = account.cachedAt
+            qrJob = lifecycleScope.launch {
+                val bitmap = withContext(Dispatchers.Default) {
+                    QrGenerator.encode(code, QrGenerator.SIZE_CARD)
+                }
+                val current = store.current()
+                if (isActive && current?.sameCard(account) == true && current.hasFreshCode() &&
+                    current.cachedCode == code && current.cachedAt == cachedAt
+                ) {
+                    binding.cardQr.setImageBitmap(bitmap)
+                }
+            }
             scheduleExpiry(account)
             binding.cardHint.text = getString(R.string.main_tap_qr)
         } else {
+            qrJob?.cancel()
             expiryJob?.cancel()
             binding.cardQr.setImageDrawable(null)
             binding.cardHint.text = getString(R.string.main_loading)
@@ -156,12 +173,18 @@ class MainActivity : AppCompatActivity() {
         if (!account.sameCard(store.current())) return
         when (r) {
             is PayCodeRepository.Result.Ok -> {
+                qrJob?.cancel()
                 clearHintAction()
                 binding.cardName.text = account.displayName()
                 showBalance(r.balance)
-                binding.cardQr.setImageBitmap(
+                val bitmap = withContext(Dispatchers.Default) {
                     QrGenerator.encode(r.code, QrGenerator.SIZE_CARD)
-                )
+                }
+                val current = store.current()
+                if (current == null || !account.sameCard(current) || !current.hasFreshCode() ||
+                    current.cachedCode != r.code
+                ) return
+                binding.cardQr.setImageBitmap(bitmap)
                 scheduleExpiry(account)
                 binding.cardHint.text = getString(R.string.main_tap_qr)
                 adapter.submit(store.list(), store.currentIndex())
@@ -187,11 +210,19 @@ class MainActivity : AppCompatActivity() {
             val current = store.current() ?: return@launch
             if (!account.sameCard(current)) return@launch
             if (current.hasFreshCode()) {
-                binding.cardQr.setImageBitmap(
-                    QrGenerator.encode(current.cachedCode, QrGenerator.SIZE_CARD)
-                )
+                val code = current.cachedCode
+                val cachedAt = current.cachedAt
+                val bitmap = withContext(Dispatchers.Default) {
+                    QrGenerator.encode(code, QrGenerator.SIZE_CARD)
+                }
+                val latest = store.current()
+                if (latest?.sameCard(current) != true || latest.cachedCode != code ||
+                    latest.cachedAt != cachedAt
+                ) return@launch
+                binding.cardQr.setImageBitmap(bitmap)
                 scheduleExpiry(current)
             } else {
+                qrJob?.cancel()
                 binding.cardQr.setImageDrawable(null)
                 if (binding.cardHint.text == getString(R.string.main_tap_qr)) {
                     binding.cardHint.text = getString(R.string.main_loading)

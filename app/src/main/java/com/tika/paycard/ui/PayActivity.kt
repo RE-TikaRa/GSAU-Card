@@ -16,9 +16,11 @@ import com.tika.paycard.qr.QrGenerator
 import com.tika.paycard.widget.PayWidgetProvider
 import com.tika.paycard.work.KeepAlive
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 全屏付款页:打开即实时拉一次最新码,之后每 30 秒自动刷新。
@@ -30,6 +32,7 @@ class PayActivity : AppCompatActivity() {
     private var loopJob: Job? = null
     private var expiryJob: Job? = null
     private var shareJob: Job? = null
+    private var qrJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +77,7 @@ class PayActivity : AppCompatActivity() {
         loopJob?.cancel()
         expiryJob?.cancel()
         shareJob?.cancel()
+        qrJob?.cancel()
         KeepAlive.leaveForeground(this)
         super.onPause()
     }
@@ -81,6 +85,7 @@ class PayActivity : AppCompatActivity() {
     private fun showCached() {
         val account = AccountStore.get(this).current()
         if (account == null) {
+            qrJob?.cancel()
             expiryJob?.cancel()
             binding.payQr.setImageDrawable(null)
             binding.payName.text = getString(R.string.pay_no_card)
@@ -91,11 +96,23 @@ class PayActivity : AppCompatActivity() {
         binding.payBalance.text =
             if (account.balance.isNotBlank()) getString(R.string.balance_format, account.balance) else ""
         if (account.hasFreshCode()) {
-            binding.payQr.setImageBitmap(
-                QrGenerator.encode(account.cachedCode, QrGenerator.SIZE_FULLSCREEN)
-            )
+            qrJob?.cancel()
+            val code = account.cachedCode
+            val cachedAt = account.cachedAt
+            qrJob = lifecycleScope.launch {
+                val bitmap = withContext(Dispatchers.Default) {
+                    QrGenerator.encode(code, QrGenerator.SIZE_FULLSCREEN)
+                }
+                val current = AccountStore.get(this@PayActivity).current()
+                if (isActive && current?.sameCard(account) == true && current.hasFreshCode() &&
+                    current.cachedCode == code && current.cachedAt == cachedAt
+                ) {
+                    binding.payQr.setImageBitmap(bitmap)
+                }
+            }
             scheduleExpiry(account)
         } else {
+            qrJob?.cancel()
             expiryJob?.cancel()
             binding.payQr.setImageDrawable(null)
         }
@@ -123,9 +140,15 @@ class PayActivity : AppCompatActivity() {
         }
         when (r) {
             is PayCodeRepository.Result.Ok -> {
-                binding.payQr.setImageBitmap(
+                qrJob?.cancel()
+                val bitmap = withContext(Dispatchers.Default) {
                     QrGenerator.encode(r.code, QrGenerator.SIZE_FULLSCREEN)
-                )
+                }
+                val current = AccountStore.get(this@PayActivity).current()
+                if (current == null || !account.sameCard(current) || !current.hasFreshCode() ||
+                    current.cachedCode != r.code
+                ) return
+                binding.payQr.setImageBitmap(bitmap)
                 scheduleExpiry(account)
                 binding.payName.text = account.displayName()
                 binding.payBalance.text =
@@ -152,7 +175,12 @@ class PayActivity : AppCompatActivity() {
             expiryJob = null
             val current = AccountStore.get(this@PayActivity).current() ?: return@launch
             if (!account.sameCard(current)) return@launch
-            if (current.hasFreshCode()) showCached() else binding.payQr.setImageDrawable(null)
+            if (current.hasFreshCode()) {
+                showCached()
+            } else {
+                qrJob?.cancel()
+                binding.payQr.setImageDrawable(null)
+            }
         }
     }
 }
