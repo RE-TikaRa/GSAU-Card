@@ -290,6 +290,7 @@ class MainActivity : AppCompatActivity() {
             when (val r = PayCodeManager.refresh(this@MainActivity, account)) {
                 is PayCodeRepository.Result.Ok -> {
                     store.add(account)
+                    KeepAlive.enterForeground(this@MainActivity)
                     val newIndex = store.list().indexOfFirst { it.sameCard(account) }
                     if (newIndex >= 0) store.setCurrentIndex(newIndex)
                     renderCurrent()
@@ -345,6 +346,7 @@ class MainActivity : AppCompatActivity() {
             positiveText = getString(R.string.remove_action),
             onPositive = {
                 store.removeAt(index)
+                KeepAlive.enterForeground(this)
                 renderCurrent()
                 startLoop()
                 adapter.submit(store.list(), store.currentIndex())

@@ -23,6 +23,7 @@ class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
     override suspend fun doWork(): Result {
         val account = AccountStore.get(applicationContext).current()
         if (account == null) {
+            cancel(applicationContext)
             PayWidgetProvider.refreshAll(applicationContext)
             return Result.success()
         }
@@ -39,6 +40,10 @@ class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         private const val WORK_NAME = "paycode_refresh"
 
         fun schedule(context: Context) {
+            if (AccountStore.get(context).current() == null) {
+                cancel(context)
+                return
+            }
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -50,6 +55,10 @@ class RefreshWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
                 ExistingPeriodicWorkPolicy.KEEP,
                 req
             )
+        }
+
+        fun cancel(context: Context) {
+            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
         }
     }
 }
