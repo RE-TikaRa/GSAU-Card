@@ -67,7 +67,10 @@ class PayWidgetProviderTest {
         assertEquals(View.GONE, view.findViewById<View>(R.id.widget_qr).visibility)
         assertEquals(context.getString(R.string.widget_open_pay), view.findViewById<TextView>(R.id.widget_hint).text)
         view.findViewById<View>(R.id.widget_refresh).performClick()
-        assertEquals(PayActivity::class.java.name, shadowOf(RuntimeEnvironment.getApplication()).nextStartedActivity.component?.className)
+        val intent = shadowOf(RuntimeEnvironment.getApplication()).nextStartedActivity
+        assertEquals(PayActivity::class.java.name, intent.component?.className)
+        assertTrue(intent.flags and Intent.FLAG_ACTIVITY_CLEAR_TOP != 0)
+        assertTrue(intent.flags and Intent.FLAG_ACTIVITY_SINGLE_TOP != 0)
         assertTrue(shadowOf(context.getSystemService(AlarmManager::class.java)).scheduledAlarms.isEmpty())
     }
 

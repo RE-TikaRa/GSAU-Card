@@ -59,7 +59,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
         binding.cardQr.setOnClickListener {
-            startActivity(Intent(this, PayActivity::class.java))
+            startActivity(
+                Intent(this, PayActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            )
         }
         binding.cardQr.setOnLongClickListener {
             if (binding.cardQr.drawable != null && shareJob?.isActive != true) {

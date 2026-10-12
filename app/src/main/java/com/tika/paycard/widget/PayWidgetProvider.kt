@@ -145,7 +145,11 @@ class PayWidgetProvider : AppWidgetProvider() {
 
     private fun openPayIntent(context: Context): PendingIntent {
         val intent = Intent(context, PayActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+            )
         return PendingIntent.getActivity(context, 1, intent, flags())
     }
 
