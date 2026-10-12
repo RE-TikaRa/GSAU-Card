@@ -2,7 +2,6 @@ package com.tika.paycard.data
 
 import android.content.Context
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -21,7 +20,7 @@ object PayCodeManager {
 
     private class Entry(
         val mutex: Mutex = Mutex(),
-        val waiters: AtomicInteger = AtomicInteger(),
+        var waiters: Int = 0,
         @Volatile var outcome: Outcome? = null
     )
 
@@ -31,8 +30,9 @@ object PayCodeManager {
     suspend fun refresh(context: Context, account: Account): PayCodeRepository.Result {
         val key = CardKey(account.openid, account.cardId)
         val invokedAt = System.nanoTime()
-        val entry = entries.computeIfAbsent(key) { Entry() }
-        entry.waiters.incrementAndGet()
+        val entry = entries.compute(key) { _, current ->
+            (current ?: Entry()).apply { waiters++ }
+        }!!
         try {
             return entry.mutex.withLock {
                 entry.outcome?.takeIf { it.completedAt >= invokedAt }?.let { outcome ->
@@ -62,8 +62,8 @@ object PayCodeManager {
                 return@withLock result
             }
         } finally {
-            if (entry.waiters.decrementAndGet() == 0) {
-                entries.remove(key, entry)
+            entries.computeIfPresent(key) { _, current ->
+                current.takeIf { --it.waiters > 0 }
             }
         }
     }
