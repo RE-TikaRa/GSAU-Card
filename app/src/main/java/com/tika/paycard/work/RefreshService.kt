@@ -71,6 +71,12 @@ class RefreshService : Service() {
         return START_STICKY
     }
 
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        Log.w(TAG, "dataSync 前台服务达到系统时限,已切回周期刷新")
+        RefreshWorker.schedule(applicationContext)
+        stopSelf(startId)
+    }
+
     override fun onDestroy() {
         scope.cancel()
         super.onDestroy()

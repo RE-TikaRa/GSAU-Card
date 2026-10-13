@@ -65,7 +65,7 @@ class RefreshWorkerTest {
 
         store.removeAt(0)
         KeepAlive.enterForeground(context)
-        assertEquals(WorkInfo.State.CANCELLED, manager.getWorkInfoById(first.id).get().state)
+        assertEquals(WorkInfo.State.CANCELLED, manager.getWorkInfoById(first.id).get()!!.state)
 
         store.add(Account("second", "9"))
         KeepAlive.enterForeground(context)

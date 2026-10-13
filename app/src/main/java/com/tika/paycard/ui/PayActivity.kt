@@ -45,6 +45,7 @@ class PayActivity : AppCompatActivity() {
         ColorManager.applyOverlay(this)
         binding = ActivityPayBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
         // 付款时提亮屏幕,方便扫码
         window.attributes = window.attributes.apply {
             screenBrightness = 1.0f

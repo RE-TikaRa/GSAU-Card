@@ -3,9 +3,10 @@ package com.tika.paycard.work
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import com.tika.paycard.data.AccountStore
 import com.tika.paycard.data.UserConsent
 
@@ -29,7 +30,7 @@ object KeepAlive {
 
     fun setMode(context: Context, mode: Mode): Boolean {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(KEY_MODE, mode.name).apply()
+            .edit { putString(KEY_MODE, mode.name) }
         return apply(context, mode)
     }
 
@@ -70,15 +71,9 @@ object KeepAlive {
         return pm.isIgnoringBatteryOptimizations(context.packageName)
     }
 
-    /** 跳到「忽略电池优化」申请弹窗(系统标准,三家通用) */
+    /** 打开系统的电池优化设置列表 */
     fun requestIgnoreBattery(context: Context) {
-        runCatching {
-            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                data = Uri.parse("package:${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        }.onFailure { openBatterySettings(context) }
+        openBatterySettings(context)
     }
 
     private fun openBatterySettings(context: Context) {
@@ -119,7 +114,7 @@ object KeepAlive {
         runCatching {
             context.startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:${context.packageName}")
+                    data = "package:${context.packageName}".toUri()
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             )

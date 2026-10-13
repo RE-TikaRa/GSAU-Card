@@ -36,7 +36,7 @@ suspend fun Call.Factory.await(request: Request): Response = suspendCancellableC
                 response.close()
                 return
             }
-            continuation.resume(response) { response.close() }
+            continuation.resume(response) { _, _, _ -> response.close() }
         }
     })
 }

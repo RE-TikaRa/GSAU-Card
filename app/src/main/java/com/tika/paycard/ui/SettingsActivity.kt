@@ -11,6 +11,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.tika.paycard.R
 import com.tika.paycard.data.AccountBackup
@@ -50,6 +51,7 @@ class SettingsActivity : AppCompatActivity() {
         ColorManager.applyOverlay(this)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
 
         binding.topbar.topbarTitle.text = getString(R.string.settings_title)
         binding.topbar.btnBack.setOnClickListener { finish() }
@@ -107,7 +109,7 @@ class SettingsActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             binding.btnAlarm.setOnClickListener {
                 startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                    data = Uri.parse("package:$packageName")
+                    data = "package:$packageName".toUri()
                 })
             }
         } else {

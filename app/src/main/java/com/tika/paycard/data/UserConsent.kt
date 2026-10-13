@@ -1,6 +1,7 @@
 package com.tika.paycard.data
 
 import android.content.Context
+import androidx.core.content.edit
 
 object UserConsent {
 
@@ -15,7 +16,7 @@ object UserConsent {
 
     fun accept(context: Context) {
         context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putInt(KEY_VERSION, CURRENT_VERSION).apply()
+            .edit { putInt(KEY_VERSION, CURRENT_VERSION) }
     }
 
     internal fun hasAcceptedVersion(context: Context, version: Int): Boolean =

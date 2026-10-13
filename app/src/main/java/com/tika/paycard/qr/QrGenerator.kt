@@ -2,6 +2,7 @@ package com.tika.paycard.qr
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.core.graphics.createBitmap
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -39,7 +40,7 @@ object QrGenerator {
                 pixels[offset + x] = if (matrix[x, y]) foreground else background
             }
         }
-        return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888).apply {
+        return createBitmap(w, h, Bitmap.Config.ARGB_8888).apply {
             setPixels(pixels, 0, w, 0, 0, w, h)
         }
     }

@@ -4,10 +4,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.tika.paycard.BuildConfig
 import com.tika.paycard.R
@@ -27,6 +27,7 @@ class AboutActivity : AppCompatActivity() {
         ColorManager.applyOverlay(this)
         binding = ActivityAboutBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
 
         binding.topbar.topbarTitle.text = getString(R.string.about_title)
         binding.topbar.btnBack.setOnClickListener { finish() }
@@ -84,7 +85,7 @@ class AboutActivity : AppCompatActivity() {
 
     private fun openUri(uri: String) {
         runCatching {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+            startActivity(Intent(Intent.ACTION_VIEW, uri.toUri()))
         }.onFailure {
             Log.w("AboutActivity", "无法打开外部链接", it)
             AppDialog.notice(binding.root, getString(R.string.about_open_failed))

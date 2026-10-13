@@ -204,7 +204,7 @@ com.tika.paycard
 
 ## 构建
 
-需要 JDK 17 和 Android SDK（compileSdk 34，build-tools 35.0.0）。
+需要 JDK 17 或更高版本和 Android SDK（compileSdk 37，build-tools 36.0.0）。
 
 ```bash
 # 首次构建前，在 local.properties 写入 SDK 路径

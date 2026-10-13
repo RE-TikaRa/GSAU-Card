@@ -3,6 +3,7 @@ package com.tika.paycard.ui
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
+import androidx.core.content.edit
 import com.tika.paycard.R
 
 /**
@@ -11,9 +12,9 @@ import com.tika.paycard.R
 object ColorManager {
 
     enum class Scheme(
-        @StyleRes val overlay: Int,
-        @DrawableRes val widgetName: Int,
-        @DrawableRes val widgetRefresh: Int
+        @get:StyleRes val overlay: Int,
+        @get:DrawableRes val widgetName: Int,
+        @get:DrawableRes val widgetRefresh: Int
     ) {
         GRAY_GREEN(R.style.ThemeOverlay_PayCard_GrayGreen, R.drawable.widget_name_gg, R.drawable.widget_refresh_gg),
         GRAY_BLUE(R.style.ThemeOverlay_PayCard_GrayBlue, R.drawable.widget_name_gb, R.drawable.widget_refresh_gb),
@@ -33,7 +34,7 @@ object ColorManager {
 
     fun setScheme(context: Context, scheme: Scheme) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(KEY_SCHEME, scheme.name).apply()
+            .edit { putString(KEY_SCHEME, scheme.name) }
     }
 
     /** 在 setContentView 之前调用,把选中配色叠加到当前主题上 */

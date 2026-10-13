@@ -27,7 +27,7 @@
 
 **同理**:`RefreshService` 不再在 `onTaskRemoved` 里手动 `start` 自身（后台启动前台服务同样受限），改由 `START_STICKY` 让系统在资源允许时自行重建。
 
-**待验证**:Android 15 且 targetSdk 35 起，`dataSync` 前台服务单日累计约 6 小时。当前 targetSdk 34 尚不受此限制，后续升级时需要重新设计后台刷新方式。
+**运行时限制**:`targetSdk 37` 下 Android 15 对 `dataSync` 前台服务实施 24 小时内累计约 6 小时的限制。`RefreshService.onTimeout` 会停止服务并保留 WorkManager 周期刷新；用户再次打开应用后重新进入前台，系统计时按平台规则重置。Android 15 真机仍需验证状态栏、导航栏和服务超时表现。
 
 ## 3. 协程刷新的账号引用竞态
 

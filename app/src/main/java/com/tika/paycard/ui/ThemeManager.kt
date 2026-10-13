@@ -2,6 +2,7 @@ package com.tika.paycard.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 
 /**
  * 主题档位:跟随系统 / 浅色 / 深色。持久化选择并映射到 AppCompatDelegate 的夜间模式。
@@ -21,7 +22,7 @@ object ThemeManager {
 
     fun setMode(context: Context, mode: Mode) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(KEY_MODE, mode.name).apply()
+            .edit { putString(KEY_MODE, mode.name) }
         apply(mode)
     }
 

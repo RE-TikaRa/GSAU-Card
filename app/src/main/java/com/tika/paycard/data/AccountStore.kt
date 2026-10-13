@@ -1,6 +1,7 @@
 package com.tika.paycard.data
 
 import android.content.Context
+import androidx.core.content.edit
 import org.json.JSONArray
 
 /**
@@ -23,9 +24,10 @@ class AccountStore internal constructor(context: Context) {
     fun save(accounts: List<Account>, currentIndex: Int? = null) = synchronized(lock) {
         val arr = JSONArray()
         accounts.forEach { arr.put(it.toJson()) }
-        val editor = prefs.edit().putString(KEY_ACCOUNTS, arr.toString())
-        if (currentIndex != null) editor.putInt(KEY_CURRENT, currentIndex)
-        editor.apply()
+        prefs.edit {
+            putString(KEY_ACCOUNTS, arr.toString())
+            if (currentIndex != null) putInt(KEY_CURRENT, currentIndex)
+        }
     }
 
     fun currentIndex(): Int = synchronized(lock) {
@@ -33,7 +35,7 @@ class AccountStore internal constructor(context: Context) {
     }
 
     fun setCurrentIndex(i: Int) = synchronized(lock) {
-        prefs.edit().putInt(KEY_CURRENT, i).apply()
+        prefs.edit { putInt(KEY_CURRENT, i) }
     }
 
     fun current(): Account? = synchronized(lock) {
@@ -78,13 +80,14 @@ class AccountStore internal constructor(context: Context) {
         if (added > 0) {
             val arr = JSONArray()
             all.forEach { arr.put(it.toJson()) }
-            val editor = prefs.edit().putString(KEY_ACCOUNTS, arr.toString())
-            if (wasEmpty) {
-                config.accounts.getOrNull(config.currentIndex)?.let { current ->
-                    editor.putInt(KEY_CURRENT, all.indexOfFirst { it.sameCard(current) })
+            prefs.edit {
+                putString(KEY_ACCOUNTS, arr.toString())
+                if (wasEmpty) {
+                    config.accounts.getOrNull(config.currentIndex)?.let { current ->
+                        putInt(KEY_CURRENT, all.indexOfFirst { it.sameCard(current) })
+                    }
                 }
             }
-            editor.apply()
         }
         added
     }

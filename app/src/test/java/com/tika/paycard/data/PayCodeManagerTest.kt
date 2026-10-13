@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.EventListener
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Protocol
 import okhttp3.Request
@@ -127,6 +128,11 @@ class PayCodeManagerTest {
         override fun isCanceled() = canceled
         override fun timeout() = Timeout()
         override fun clone() = PendingCall(request)
+        override fun addEventListener(eventListener: EventListener) = Unit
+        override fun <T> tag(type: Class<out T>): T? = null
+        override fun <T : Any> tag(type: kotlin.reflect.KClass<T>): T? = null
+        override fun <T : Any> tag(type: Class<T>, computeIfAbsent: () -> T): T = computeIfAbsent()
+        override fun <T : Any> tag(type: kotlin.reflect.KClass<T>, computeIfAbsent: () -> T): T = computeIfAbsent()
 
         fun respond(code: String) {
             callback.onResponse(this, Response.Builder()

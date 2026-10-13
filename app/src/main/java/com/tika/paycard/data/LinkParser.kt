@@ -1,6 +1,6 @@
 package com.tika.paycard.data
 
-import android.net.Uri
+import androidx.core.net.toUri
 
 /**
  * 从用户粘贴的付款码链接里解析 openid 和 id。
@@ -14,7 +14,7 @@ object LinkParser {
         val trimmed = text.trim()
         // 先按标准 URL 解析
         runCatching {
-            val uri = Uri.parse(trimmed)
+            val uri = trimmed.toUri()
             val openid = uri.getQueryParameter("openid")
             if (openid != null && isValidOpenid(openid)) {
                 val rawId = uri.getQueryParameter("id")

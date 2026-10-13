@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         appliedScheme = ColorManager.getScheme(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
         store = AccountStore.get(this)
 
         maybeShowGuide()
@@ -89,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     private fun maybeShowGuide() {
         val prefs = getSharedPreferences(PREFS_GUIDE, MODE_PRIVATE)
         if (prefs.getBoolean(KEY_GUIDE_SHOWN, false)) return
-        prefs.edit().putBoolean(KEY_GUIDE_SHOWN, true).apply()
+        prefs.edit { putBoolean(KEY_GUIDE_SHOWN, true) }
         startActivity(Intent(this, GuideActivity::class.java))
     }
 
@@ -250,7 +252,7 @@ class MainActivity : AppCompatActivity() {
     private fun showInvalidHint(account: Account) {
         binding.cardHint.text = getString(R.string.main_invalid)
         binding.cardHint.setTextColor(
-            MaterialColors.getColor(binding.cardHint, com.google.android.material.R.attr.colorPrimary)
+            MaterialColors.getColor(binding.cardHint, androidx.appcompat.R.attr.colorPrimary)
         )
         binding.cardHint.isClickable = true
         binding.cardHint.setOnClickListener { showRebindDialog(account) }

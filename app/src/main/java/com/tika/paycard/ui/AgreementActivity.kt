@@ -20,6 +20,7 @@ class AgreementActivity : AppCompatActivity() {
         ColorManager.applyOverlay(this)
         binding = ActivityAgreementBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
 
         binding.agreementPrivacy.setOnClickListener {
             AppDialog.message(

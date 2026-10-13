@@ -22,6 +22,7 @@ class GuideActivity : AppCompatActivity() {
         ColorManager.applyOverlay(this)
         binding = ActivityGuideBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBars.apply(this, binding.root)
 
         binding.topbar.topbarTitle.text = getString(R.string.guide_title)
         binding.topbar.btnBack.setOnClickListener { finish() }
