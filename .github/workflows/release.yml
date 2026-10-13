@@ -18,6 +18,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.release_tag || github.ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -59,9 +62,29 @@ jobs:
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk "dist/GSAU-Card-${RELEASE_TAG}.apk"
 
+      - name: Generate release notes
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          previous_tag="$(git tag --sort=-version:refname | grep '^v' | grep -Fxv "$RELEASE_TAG" | head -n 1 || true)"
+          {
+            echo "## 提交记录"
+            echo
+            if [ -n "$previous_tag" ] && git rev-parse --verify "${RELEASE_TAG}^{commit}" >/dev/null 2>&1; then
+              git log --format='- `%h` %s' "${previous_tag}..${RELEASE_TAG}"
+              echo
+              echo "## 对比"
+              echo
+              echo "[${previous_tag}...${RELEASE_TAG}](https://github.com/${REPOSITORY}/compare/${previous_tag}...${RELEASE_TAG})"
+            else
+              git log --format='- `%h` %s' -n 20 "${RELEASE_TAG}"
+            fi
+          } > dist/release-notes.md
+
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
           files: dist/GSAU-Card-${{ inputs.release_tag || github.ref_name }}.apk
-          generate_release_notes: true
+          body_path: dist/release-notes.md
